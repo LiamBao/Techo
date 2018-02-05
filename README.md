@@ -4,20 +4,25 @@
 
 🎨[Shell|Python|C|C++]GIST
 
->✍️references & notes 
+>references & notes✍️ 
 
 ### Dir Tree:
 
 ```
-├── README.md                       README
-├── curl.sh                         curl para
+.
+├── Django\ tips                    django framework
+│   └── middleware_sample.py        middleware sample  
+├── README.md                       readme
+├── curl.sh                         curl usage
 ├── esxi_cmds.sh                    esxi command options
-├── keytool.sh                      keytool usage
-├── mac_prune.sh                    mac docker prune
+├── keytool.sh                      eytool usage
+├── mac_prune.sh                    mac docker pruned
 ├── run_web_service.sh              shell script for web start|stop|restart 
 ├── similarity.py                   text similarity
 ├── updateNetworks.sh               provision networks configurations of esxi vms in linux opt
-└── web-learning                    django framework
-    ├── lib_websocket_server.py     Socket Programming Simple Web Server
-    └── middleware_sample.py        middleware sample 
+└── uwsgi\ example                  Socket Programming Simple Web Server
+    ├── app.py
+    ├── gateway,py
+    ├── lib_web_server.py           python lib socket server file
+    └── socket_server.py
 ```
