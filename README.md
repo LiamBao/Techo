@@ -12,7 +12,10 @@
 .
 ├── Django\ tips                    django framework
 │   └── middleware_sample.py        middleware sample  
-├── README.md                       readme
+├── Kubernets                       Kubernets notes
+│   ├── UDACITY.md
+│   └── overview.md
+├── README.md                       Readme
 ├── curl.sh                         curl usage
 ├── esxi_cmds.sh                    esxi command options
 ├── keytool.sh                      eytool usage
