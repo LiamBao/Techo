@@ -1,4 +1,4 @@
-#Techo
+# Techo
 
 🎨[shell|python|c|c++]GIST
 
