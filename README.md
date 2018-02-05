@@ -1,4 +1,6 @@
-# Techo [Can't afford😀](https://www.1101.com/store/techo/en/)
+# Techo ��
+
+[Can't afford😀](https://www.1101.com/store/techo/en/)
 
 🎨[Shell|Python|C|C++]GIST
 
