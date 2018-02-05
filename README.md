@@ -1,10 +1,10 @@
-# Techo
+# Techo [Can't afford😀](https://www.1101.com/store/techo/en/)
 
-🎨[shell|python|c|c++]GIST
+🎨[Shell|Python|C|C++]GIST
 
 >✍️references & notes 
 
-### DIR Tree:
+### Dir Tree:
 
 ```
 ├── README.md                       README
