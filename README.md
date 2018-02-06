@@ -8,6 +8,7 @@
 
 ### Dir Tree:
 
+```
 .
 ├── Django-tips                    django framework
 │   └── middleware_sample.py        middleware sample  
@@ -27,3 +28,4 @@
     ├── gateway,py
     ├── lib_web_server.py           python lib socket server file
     └── socket_server.py
+```
