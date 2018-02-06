@@ -45,13 +45,24 @@ Node 包含了四個基本組件\
 • Deployments (Replication Controller)\
 
 
-#### - ***Pod***
-容器是位於pod內部，一個pod包覆著一個以上的容器，這造成K8S與一般容器不同的操作概念。在Docker裡，Docker container是最小單位，但在K8S可想作pod為最小單位。從以下pod的特性來看，就可以了解為什麼它是K8S裡面三巨頭之一了。
+![Kubernets Cluster](./images/kebunets-cluster.png)
 
-- Pod 擁有不確定的生命週期，這意味著您不曉得任一pod是否會永久保留
-- Pod 內有一個讓所有container共用的Volume，這會與Docker不同
-- Pod 採取shared IP，內部所有的容器皆使用同一個Pod IP，這也與Docker不同
-- Pod 內的眾多容器都會和Pod同生共死，就像桃園三結義一樣！
+#### - ***Pod***
+容器是位於pod內部，一個pod包覆著一個以上的容器，這造成K8S與一般容器不同的操作概念。在Docker裡，Docker container是最小單位，但在K8S可想作pod為最小單位  
+Pod安排在节点上，包含一组容器和卷。同一个Pod里的容器共享同一个网络命名空间，可以使用localhost互相通信。pod 由一个或者多个容器组成，一般运行着相同的应用。一个 pod 中的所有容器都必须运行在同一台机器上共享网络空间（network namespace）和存储 （volume)  
+Pod是短暂的，不是持续性实体你可能会有这些问题:  
+- 如果Pod是短暂的，那么我怎么才能持久化容器数据使其能够跨重启而存在呢？ 是的，Kubernetes支持卷的概念，因此可以使用持久化的卷类型  
+- 是否手动创建Pod，如果想要创建同一个容器的多份拷贝，需要一个个分别创建出来么？可以手动创建单个Pod，但是也可以使用Replication Controller使用Pod模板创建出多份拷贝，下文会详细介绍  
+- 如果Pod是短暂的，那么重启时IP地址可能会改变，那么怎么才能从前端容器正确可靠地指向后台容器呢？这时可以使用Service，下文会详细介绍  
+
+- Pod 擁有不確定的生命週期，這意味著您不曉得任一pod是否會永久保留  
+- Pod 內有一個讓所有container共用的Volume，這會與Docker不同  
+- Pod 採取shared IP，內部所有的容器皆使用同一個Pod IP，這也與Docker不同  
+- Pod 內的眾多容器都會和Pod同生共死，就像桃園三結義一樣！  
+
+#### - ***Lable***
+正如图所示，一些Pod有Label。一个Label是attach到Pod的一对键/值对，用来传递用户定义的属性。比如，你可能创建了一个"tier"和“app”标签，通过Label（tier=frontend, app=myapp）来标记前端Pod容器，使用Label（tier=backend, app=myapp）标记后台Pod。然后可以使用Selectors选择带有特定Label的Pod，并且将Service或者Replication Controller应用到上面。
+
 
 #### - ***Service***
 K8S的 Service 有它的獨特方法，我們看看它的特性
@@ -67,3 +78,63 @@ Deployments顧名思義掌控了部署Kubernetes服務的一切它主要掌管�
 - Deployments 的設定檔(底下以YAML格式為例)，可以指定replica，並保證在該replica的數量運作
 - Deployments 會檢查pod的狀態
 - Deployments 下可執行滾動更新或者回滾
+
+
+### - ***kubernetes 组件***
+kubernetes 整体上的框架是下面这样的，由多个不同的部分组成，下面将逐个讲解这些部分的功能
+
+![Architecture](./images/architecture-small.png)
+
+#### ***kubectl***  
+这是 kubernetes 提供的客户端程序，也是目前常用的和集群交互的方式。创建、查看、管理、删除、更新 pod、service、replication controller 都行，还有更多其他命令，可以查看帮助文档。
+
+#### ***etcd 集群***  
+etcd 是 kubernetes 存放集群状态和配置的地方，这是集群状态同步的关键，所有节点都是从 etcd 中获取集群中其他机器状态的；集群中所有容器的状态也是放在这里的。
+
+kubernetes 在 etcd 中存储的数据在 /registry 路径下，结构类似下面这样：
+
+```
+  /registry/minions
+  /registry/namespaces
+  /registry/pods
+  /registry/ranges
+  /registry/serviceaccounts
+  /registry/services
+  /registry/controllers
+  /registry/events
+```
+
+#### ***Master 组件***  
+kubernetes 是典型的 master-slave 模式，master 是整个集群的大脑，负责控制集群的方方面面。
+
+#### ***API server***  
+对外提供 kubernetes API，也就是 kubernetes 对外的统一入口。封装了 kubernetes 所有的逻辑，通过 RESTful 的方式供客户端使用，kubectl 就是最常用到的客户端程序。
+
+#### ***Scheduler***  
+调度器：实现容器调度的组件，调度算法可以由用户自己实现。Scheduler 会收集并分析当前系统中所有 slave 节点的负载情况，在调度的时候作为决策的重要依据。
+
+调度器监听 etcd 中 pods 目录的变化，当发现新的 pod 时，会利用调度算法把 pod 放到某个节点进行部署。可能的 scheduler 包括：
+
+> random：随机调度算法
+> round robin：轮询调度
+
+#### ***Controller Manager Server***
+集群中其他功能都是在 controller manager 中实现的，每个部分负责一个独立功能的管理。例如：
+```
+endpoints controller
+node controller
+replication controller
+service controller
+```
+
+#### ***slave 组件***
+
+***kubelet***
+kubelet 是 slave 上核心的工作进程，负责容器和 pod 的实际管理工作（创建、删除等）以及和 master 通信，内容包括：
+
+负责容器的创建、停止、删除等具体工作，也包括镜像下载、 volume 管理
+从 etcd 中获取分配给自己的信息，根据其中的信息来控制容器以达到对应的目标状态
+接受来自 master 的请求，汇报本节点的信息
+
+***kube-proxy***
+正如名字提示的一样，kube-proxy 为 pod 提供代理服务，用来实现 kubernetes 的 service 机制。每个 service 都会被分配一个虚拟 ip，当应用访问到 service ip 和端口的时候，会先发送到 kube-proxy，然后才转发到机器上的容器服务。
