@@ -10,13 +10,14 @@
 
 ```
 .
-├── Django-tips                    django framework
+├── Django-tips                     django framework
 │   └── middleware_sample.py        middleware sample  
 ├── Kubernets                       Kubernets notes
-│   ├── UDACITY.md                  [Udacity Kubernets](https://github.com/LiamBao/Techo/blob/master/Kubernets/UDACITY.md)
-│   └── overview.md                 [Knbernets overviews](https://github.com/LiamBao/Techo/blob/master/Kubernets/overview.md)
+│   ├── UDACITY.md                  Udacity Kubernets
+│   └── overview.md                 Knbernets overviews
 ├── README.md                       Readme
 ├── curl.sh                         curl usage
+├── dhclient.sh                     dhclient usage
 ├── esxi_cmds.sh                    esxi command options
 ├── keytool.sh                      eytool usage
 ├── mac_prune.sh                    mac docker pruned
@@ -29,3 +30,8 @@
     ├── lib_web_server.py           python lib socket server file
     └── socket_server.py
 ```
+
+### - ***Links***
+
+UDACITY.md                  [Udacity Kubernets]\(https://github.com/LiamBao/Techo/blob/master/Kubernets/UDACITY.md\)
+overview.md                 [Knbernets overviews](https://github.com/LiamBao/Techo/blob/master/Kubernets/overview.md)
