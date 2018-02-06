@@ -1,5 +1,5 @@
 
-![](https://github.com/LiamBao/Techo/tree/master/Kubernets/images/docker-swarm-kubernetes-1024x504.png)
+![](./images/docker-swarm-kubernetes-1024x504.png)
 
 - [GCE 搭建环境](https://blog.gcp.expert/gke-k8s-pod-network/)
 - [Microservices](https://martinfowler.com/articles/microservices.html)

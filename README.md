@@ -33,5 +33,5 @@
 
 ### - ***Links***
 
-UDACITY.md                  [Udacity Kubernets]\(https://github.com/LiamBao/Techo/blob/master/Kubernets/UDACITY.md\)
+UDACITY.md                  [Udacity Kubernets](https://github.com/LiamBao/Techo/blob/master/Kubernets/UDACITY.md)
 overview.md                 [Knbernets overviews](https://github.com/LiamBao/Techo/blob/master/Kubernets/overview.md)
