@@ -9,10 +9,10 @@
 ```
 .
 ├── Django-tips                     django framework
-│   └── middleware_sample.py        middleware sample  
+    └── middleware_sample.py        middleware sample  
 ├── Kubernets                       Kubernets notes
-│   ├── UDACITY.md                  Udacity Kubernets
-│   └── overview.md                 Knbernets overviews
+    ├── UDACITY.md                  Udacity Kubernets
+    └── overview.md                 Knbernets overviews
 └── uwsgi-example                   Socket Programming Simple Web Server
     ├── app.py
     ├── gateway,py

@@ -3,6 +3,7 @@
 
 - [GCE 搭建环境](https://blog.gcp.expert/gke-k8s-pod-network/)
 - [Microservices](https://martinfowler.com/articles/microservices.html)
+- [十分钟带你理解Kubernetes核心概念](http://dockone.io/article/932)  
 
 Kubernetes 是自动化容器操作的开源平台，这些操作包括部署，调度和节点集群间扩展。如果你曾经用过Docker容器技术部署容器，那么可以将Docker看成Kubernetes内部使用的低级别组件。Kubernetes不仅仅支持Docker，还支持Rocket，这是另一种容器技术。
 使用Kubernetes可以：
@@ -86,7 +87,7 @@ kubernetes 整体上的框架是下面这样的，由多个不同的部分组成
 ![Architecture](./images/architecture-small.png)
 
 #### ***kubectl***  
-这是 kubernetes 提供的客户端程序，也是目前常用的和集群交互的方式。创建、查看、管理、删除、更新 pod、service、replication controller 都行，还有更多其他命令，可以查看帮助文档。
+这是 kubernetes 提供的客户端程序，也是目前常用的和集群交互的方式。创建、查看、管理、删除、更新 pod、service、replication controller，还有更多其他命令
 
 #### ***etcd 集群***  
 etcd 是 kubernetes 存放集群状态和配置的地方，这是集群状态同步的关键，所有节点都是从 etcd 中获取集群中其他机器状态的；集群中所有容器的状态也是放在这里的。
@@ -115,7 +116,7 @@ kubernetes 是典型的 master-slave 模式，master 是整个集群的大脑，
 
 调度器监听 etcd 中 pods 目录的变化，当发现新的 pod 时，会利用调度算法把 pod 放到某个节点进行部署。可能的 scheduler 包括：
 
-> random：随机调度算法
+> random：随机调度算法  
 > round robin：轮询调度
 
 #### ***Controller Manager Server***
@@ -129,12 +130,12 @@ service controller
 
 #### ***slave 组件***
 
-***kubelet***
+***kubelet***  
 kubelet 是 slave 上核心的工作进程，负责容器和 pod 的实际管理工作（创建、删除等）以及和 master 通信，内容包括：
 
 负责容器的创建、停止、删除等具体工作，也包括镜像下载、 volume 管理
 从 etcd 中获取分配给自己的信息，根据其中的信息来控制容器以达到对应的目标状态
 接受来自 master 的请求，汇报本节点的信息
 
-***kube-proxy***
+***kube-proxy***  
 正如名字提示的一样，kube-proxy 为 pod 提供代理服务，用来实现 kubernetes 的 service 机制。每个 service 都会被分配一个虚拟 ip，当应用访问到 service ip 和端口的时候，会先发送到 kube-proxy，然后才转发到机器上的容器服务。
