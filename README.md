@@ -1,6 +1,6 @@
 # Techo 📚
 
-####[ 📌 Home Page](https://www.jianshu.com/u/2156001a3715)
+#### [ 📌 Home Page](https://www.jianshu.com/u/2156001a3715)
 
 [Can't afford the Techo!](https://www.1101.com/store/techo/en/)
 🎨[Shell|Python|C|C++]GIST references & notes
