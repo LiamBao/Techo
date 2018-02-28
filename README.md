@@ -1,8 +1,10 @@
 # Techo 📚
 
-[Can't afford the Techo!](https://www.1101.com/store/techo/en/) 😀
+####[ 📌 Home Page](https://www.jianshu.com/u/2156001a3715)
 
+[Can't afford the Techo!](https://www.1101.com/store/techo/en/)
 🎨[Shell|Python|C|C++]GIST references & notes
+
 
 ### -***Dir Tree***
 
@@ -18,15 +20,18 @@
     ├── gateway,py
     ├── lib_web_server.py           python lib socket server file
     └── socket_server.py
+├── Networks
+    ├── VPN-IPsec.md
+    ├── dhclient.sh                 dhclient usage
+    ├── keytool.sh                  keytool usage
+    └── updateNetworks.sh           provision networks configurations of esxi vms in linux opt
+    └── websocket.md
 ├── README.md                       Readme
 ├── curl.sh                         curl usage
-├── dhclient.sh                     dhclient usage
 ├── esxi_cmds.sh                    esxi command options
-├── keytool.sh                      eytool usage
 ├── mac_prune.sh                    mac docker pruned
 ├── run_web_service.sh              shell script for web start|stop|restart 
 ├── similarity.py                   text similarity
-├── updateNetworks.sh               provision networks configurations of esxi vms in linux opt
 
 ```
 
