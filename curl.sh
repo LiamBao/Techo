@@ -20,6 +20,7 @@ fnQueryDeviceDetails()
       </sear:getDeviceDetails>
     </soapenv:Body>
   </soapenv:Envelope>"
+  
 
   var="$(curl -k -H "Content-Type: text/xml; charset=utf-8" --user "$2:$3"   \
        -H "SOAPAction: http://search.nbapi.xxx.com/getDeviceDetails" -d "$postData" \

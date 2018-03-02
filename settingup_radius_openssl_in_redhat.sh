@@ -1,4 +1,7 @@
+#!/bin/sh +x
+
 ## Installation Guide for radius and openssl server in RHEL7 or centos
+
 
 #version=RHEL7
 # Install OS instead of upgrade

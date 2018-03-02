@@ -18,6 +18,7 @@
 # so we need get the realpath before get the name for directory
 ROOT_DIR=$(dirname $(readlink -e $0))
 
+
 export HOME=$ROOT_DIR
 export BASEDIR=$ROOT_DIR
 export ORCHENV_DIR=$ROOT_DIR/../env

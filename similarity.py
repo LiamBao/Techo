@@ -159,6 +159,7 @@ def main():
     for item in similarities_result:
         sim_file.write(str(item[1]) + '\t'*5 + item[0] + '\n')
     sim_file.close()
+    
 
     print('Similarity comparision completed. Please find the details in result.txt.\n')
 
