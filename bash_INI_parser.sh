@@ -9,14 +9,17 @@
 
 #### config file 
 
-#[config_part_1]
-#ip=10.10.10.99
-#username=root
+cat > $pathtoyourpro/configfile.ini <<EOF
+; INI file  
+[config_part_1]
+ip=10.10.10.99
+username=root
 
-#[config_part_2]
-#buildipaddress=10.124.22.103
-#buildusername=root
+[config_part_2]
+buildipaddress=10.10.10.90
+buildusername=root
 
+EOF
 
 cfg.parser ()
 {
