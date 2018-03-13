@@ -28,7 +28,11 @@ export PYSPARK_DRIVER_PYTHON_OPTS="notebook"
 export PYSPARK_PYTHON=python3
 
 sudo chmod 777 '~/spark-2.1.0-bin-hadoop2.7' 
+sudo chmod 777 '~/spark-2.1.0-bin-hadoop2.7/python'
+sudo chmod 777 '~/spark-2.1.0-bin-hadoop2.7/python/pyspark'
 ```
+cd to '~/spark-2.1.0-bin-hadoop2.7/python' ,cmd :
+`jupyter notebook`
 
 OR add to .zshrc profile
 
@@ -66,3 +70,7 @@ alias snotebook='$SPARK_PATH/bin/pyspark --master local[2]'
 
 
 Now add export `HADOOP_HOME=~/hadoop-x.x.x` to your .zshrc. Open a new terminal and try again
+
+
+### Databricks: 
+https://accounts.cloud.databricks.com/registration.html
