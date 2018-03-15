@@ -19,6 +19,17 @@ For more information about FlexVPN, see [FlexVPN Software Configuration Guide fo
 
 
 
+---
+
+### Network Device Virtualization with VRF
+
+[ Network Virtualization--Path Isolation Design Guide ](https://www.cisco.com/c/en/us/td/docs/solutions/Enterprise/Network_Virtualization/PathIsol.html#wp80043)
+
+A VRF instance consists of an IP routing table, a derived forwarding table, a set of interfaces that use the forwarding table, and a set of rules and routing protocols that determine what goes into the forwarding table. As shown in Figure 4, the use of VRF technology allows the customer to virtualize a network device from a Layer 3 standpoint, creating different "virtual routers" in the same physical device.
+
+
+
+
 
 ### CMD guide
 
