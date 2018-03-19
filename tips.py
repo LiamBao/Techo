@@ -3,25 +3,318 @@
 
 """
 
+     Initialize the logging for IOK installer
+     __file__ is not recognized once built into .exe, use getcwd instead.
 
 """
-class Counter:
-    def __init__(self, func):
-        self.func = func
-        self.count = 0
+app_dir = os.getcwd()   # os.path.dirname(os.path.realpath(__file__))
+log_dir = '%s\\%s\\' %(app_dir, iok_log_dir)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
-    def __call__(self, *args, **kwargs):
-        self.count += 1
-        return self.func(*args, **kwargs)
+log_file = log_dir + os.path.basename(sys.argv[0])
+log_file = os.path.splitext(log_file)[0] + '.log'
+log_file_old = log_file + ".old"
 
-@Counter
-def foo():
+if os.path.exists(log_file):
+    if os.path.exists(log_file_old):
+        os.remove(log_file_old)
+    os.rename(log_file, log_file_old)
+
+logger = logging.getLogger(" PRO NAME ")
+log_handler = logging.FileHandler(log_file)
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+log_handler.setFormatter(log_formatter)
+logger.addHandler(log_handler)
+logger.setLevel(logging.INFO)
+
+
+"""
+
+    Force installer exit, disconnect web service connections and the SSH
+    connections, log the error message as well as pring to the console.
+
+"""
+def iok_exit(str):
+    if (esxi_server.is_connected()):
+        esxi_server.disconnect()
+    esxi_client.close()
+    logger.error(str)
+    exit(str)
+    return
+
+# Display warning message into console as well as log it into the logger
+def iok_warn(str):
+    logger.warn(str)
+    print 'Warning: %s' %(str)
+    return
+
+# Display info message into console as well as log it into the logger
+def iok_info(str):
+    logger.info(str)
+    print str
+    return
+
+
+"""
+    Verify if an IP is a valid IPv4 address
+"""
+def valid_ip(address):
+    try:
+        socket.inet_aton(address)
+        return True
+    except:
+        return False
+
+
+# Copy directory recursively
+def copy_files(src_dir, dst_dir):
+    if os.path.exists(dst_dir):
+        shutil.rmtree(dst_dir)
+
+    shutil.copytree(src_dir, dst_dir)
+
+
+
+"""==============>>>>>>>>>>>> Desgin Pattern Start <<<<<<================="""
+"""
+
+    单例模式:SINGLETON: 
+
+"""
+def singleton(cls):
+    """decorator 方法
+    """
+    instances ={}
+
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return wrapper
+
+
+@singleton
+clss Foo(object):
     pass
 
-for i in range(10):
-    foo()
+foo1 = Foo()
+foo2 = Foo()
 
-print(foo.count)
+print foo1 = foo2
+
+class Singleton(type):
+    """使用元类
+    """
+    def 
+
+
+def Foo(object):
+    __metaclass__ = Singleton
+
+
+class Singleton(object):
+    """new 使用基类
+    """
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+class Foo(object):
+    pass
+
+foo1 = Foo()
+foo2 = Foo()
+
+print foo1 = foo2
+
+
+"""
+    抽象工厂模式
+
+    提供一个接口，用于创建 相关的对象家族
+    抽象工厂模式创建的是对象家族，也就是很多对象而不是一个对象，并且这些对象是相关的，也就是说必须一起创建出来
+    而工厂模式只是用于创建一个对象，这和抽象工厂模式有很大不同
+
+    至于创建对象的家族这一概念是在 Client 体现，Client 要通过 AbstractFactory 同时调用两个方法来创建出两个对象，在这里这两个对象就有很大的相关性，Client 需要同时创建出这两个对象。
+
+"""
+
+
+
+
+
+
+"""
+    工厂模式:
+        它把实例化的操作单独放到一个类中，这个类就成为简单工厂类，让简单工厂类来决定应该用哪个子类来实例化
+
+        这样做能把客户类和具体子类的实现解耦，客户类不再需要知道有哪些子类以及应当实例化哪个子类
+        因为客户类往往有多个，如果不使用简单工厂，所有的客户类都要知道所有子类的细节
+        而且一旦子类发生改变，例如增加子类，那么所有的客户类都要进行修改
+
+    设计原则:
+        依赖倒置原则：要依赖抽象，不要依赖具体类。听起来像是针对接口编程，不针对实现编程，但是这个原则说明了：不能让高层组件依赖底层组件，而且，不管高层或底层组件，两者都应该依赖于抽象
+
+"""
+
+
+
+"""
+
+   装饰模式:
+   动态地将责任附加到对象上。在扩展功能上，装饰者提供了比继承更有弹性的替代方案
+   装饰者（Decorator）和具体组件（ConcreteComponent）都继承自组件（Component)
+   具体组件的方法实现不需要依赖于其它对象，而装饰者组合了一个组件，这样它可以装饰其它装饰者或者具体组件
+   所谓装饰，就是把这个装饰者套在被装饰上，从而动态扩展被装饰者的功能。
+   装饰者的方法有一部分是自己的，这属于它的功能，然后调用被装饰者的方法实现，从而也保留了被装饰者的功能。
+   具体组件应当是装饰层次的最低层，因为只有具体组件的方法实现不需要依赖于其它对象
+
+"""
+
+
+
+"""
+
+    观察者模式:
+    定义了对象之间的一对多依赖，当一个对象改变状态时，它的所有依赖者都会收到通知并自动更新.
+    主题（Subject）是被观察的对象，而其所有依赖者（Observer）称为观察者
+
+"""
+# class Publisher(object):
+#     """创建一个发布者 Publisher，他是作为事件发布对象的抽象
+#     创建了一个用于存放所有观察者对象的list,add remove方法用于 新增/移除 观察者对象
+#     而notify方法就是将由事件触发的消息发送给每个观察者,并调用观察者自己的notify方法进行操作
+#     这是实现观察者模式的核心
+#     """ 
+#     def __init__(self):
+#         self.observers = list()
+
+#     def add(self, observers):
+#         if observers in self.observers:
+#             print('fail to add: {}'.format(observers))
+#         else:
+#             self.observers.append(observers)
+
+#     def remove(self, observers):
+#         try:
+#             self.observers.remove(observers)
+#         except Exception as e:
+#             print('fail to remove: {}, {}'.format(observers, e))
+
+#     def notify(self):
+#         [o.notify(self) for o in self.observers]
+
+# class DefaultFormatter(Publisher):
+#     """创建一个实际的事件发布对象，这个对象就是事件最初触发的位置
+#     发布对象需要继承自发布者，并且在__init__方法中要做的第一件事情就是调用基类的__init__方法
+#     在事件触发的位置，要调用 notify 方法，本例中是对 data 复制的 setter 中调用的，
+#     如果在事件触发的位置不调用，那么观察者模式就失去了其意义，自然也就不是观察者模式了
+#     """
+#     def __init__(self, name):
+#         Publisher.__init__(self)
+#         self.name = name
+#         self._data = 0
+
+#     def __str__(self):
+#         return '{}: "{}" has data = {}'.format(type(self).__name__, self.name, self._data)
+
+#     @property
+#     def data(self):
+#         return self._data
+
+#     @data.setter
+#     def data(self, new_value):
+#         try:
+#             self._data = int(new_value)
+#         except Exception as e:
+#             print('Error: {}'.format(e))
+#         else:
+#             self.notify()
+
+# class HexFormatter(object):  
+#     def notify(self, publisher):
+#         print("{}: '{}' has now hex data = {}".format(type(self).__name__,publisher.name, hex(publisher.data)))
+
+# class BinaryFormatter(object):  
+#     def notify(self, publisher):
+#         print("{}: '{}' has now bin data = {}".format(type(self).__name__,publisher.name, bin(publisher.data)))  
+
+# def main():  
+#     df = DefaultFormatter('test1')
+#     print(df)
+#     cf = DefaultFormatter('test2')
+#     print(cf)
+
+#     print()
+#     hf = HexFormatter()
+#     df.add(hf)
+#     df.data = 3
+
+#     cf.add(hf)
+#     cf.data = 16
+#     print(df)
+#     print(cf)
+
+#     print()
+#     bf = BinaryFormatter()
+#     df.add(bf)
+#     df.data = 21
+#     cf.add(bf)
+#     cf.data = 16
+#     print(df)
+#     print(cf)
+
+#     print()
+#     df.remove(hf)
+#     df.data = 40
+#     cf.data = 1024
+#     print(df)
+#     print(cf)
+
+#     print()
+#     df.remove(hf)
+#     df.add(bf)
+
+#     df.data = 'hello'
+#     cf.add(bf)
+#     print(df)
+#     print(cf)
+
+#     print()
+#     df.data = 15.8
+#     print(df)
+#     cf.data = 32
+#     print(cf)
+
+# if __name__ == '__main__':  
+#     main()
+
+"""
+
+    class 类装饰器作为方法调用次数校验
+
+"""
+# class Counter:
+#     def __init__(self, func):
+#         self.func = func
+#         self.count = 0
+
+#     def __call__(self, *args, **kwargs):
+#         self.count += 1
+#         return self.func(*args, **kwargs)
+
+# @Counter
+# def foo():
+#     pass
+
+# for i in range(10):
+#     foo()
+
+# print(foo.count)
+"""==============>>>>>>>>>>>>  Desgin Pattern ENDS <<<<<<<<<<<<<<<============"""
+
 
 """
 
