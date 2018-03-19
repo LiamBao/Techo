@@ -30,33 +30,6 @@ logger.setLevel(logging.INFO)
 
 
 """
-
-    Force installer exit, disconnect web service connections and the SSH
-    connections, log the error message as well as pring to the console.
-
-"""
-def iok_exit(str):
-    if (esxi_server.is_connected()):
-        esxi_server.disconnect()
-    esxi_client.close()
-    logger.error(str)
-    exit(str)
-    return
-
-# Display warning message into console as well as log it into the logger
-def iok_warn(str):
-    logger.warn(str)
-    print 'Warning: %s' %(str)
-    return
-
-# Display info message into console as well as log it into the logger
-def iok_info(str):
-    logger.info(str)
-    print str
-    return
-
-
-"""
     Verify if an IP is a valid IPv4 address
 """
 def valid_ip(address):
@@ -66,8 +39,9 @@ def valid_ip(address):
     except:
         return False
 
-
-# Copy directory recursively
+"""
+    Copy directory recursively
+"""
 def copy_files(src_dir, dst_dir):
     if os.path.exists(dst_dir):
         shutil.rmtree(dst_dir)
@@ -75,11 +49,10 @@ def copy_files(src_dir, dst_dir):
     shutil.copytree(src_dir, dst_dir)
 
 
-
-"""==============>>>>>>>>>>>> Desgin Pattern Start <<<<<<================="""
+"""==============>>>>>>>>>>>> Desgin Pattern STARTS <<<<<<================="""
 """
 
-    单例模式:SINGLETON: 
+    单例模式SINGLETON: 
 
 """
 def singleton(cls):
