@@ -1,106 +1,70 @@
 # -*- coding:utf-8 -*-
-
-
-"""
-
-     Initialize the logging for IOK installer
-     __file__ is not recognized once built into .exe, use getcwd instead.
-
-"""
-app_dir = os.getcwd()   # os.path.dirname(os.path.realpath(__file__))
-log_dir = '%s\\%s\\' %(app_dir, iok_log_dir)
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-
-log_file = log_dir + os.path.basename(sys.argv[0])
-log_file = os.path.splitext(log_file)[0] + '.log'
-log_file_old = log_file + ".old"
-
-if os.path.exists(log_file):
-    if os.path.exists(log_file_old):
-        os.remove(log_file_old)
-    os.rename(log_file, log_file_old)
-
-logger = logging.getLogger(" PRO NAME ")
-log_handler = logging.FileHandler(log_file)
-log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-log_handler.setFormatter(log_formatter)
-logger.addHandler(log_handler)
-logger.setLevel(logging.INFO)
-
-
-"""
-    Verify if an IP is a valid IPv4 address
-"""
-def valid_ip(address):
-    try:
-        socket.inet_aton(address)
-        return True
-    except:
-        return False
-
-"""
-    Copy directory recursively
-"""
-def copy_files(src_dir, dst_dir):
-    if os.path.exists(dst_dir):
-        shutil.rmtree(dst_dir)
-
-    shutil.copytree(src_dir, dst_dir)
+__author__ = 'liam_bao@163.com'
+import dis
 
 
 """==============>>>>>>>>>>>> Desgin Pattern STARTS <<<<<<================="""
 """
 
-    单例模式SINGLETON: 
+    单例模式SINGLETON
 
 """
-def singleton(cls):
-    """decorator 方法
-    """
-    instances ={}
+# def singleton(cls):
+#     """decorator 方法
+#     """
+#     instances ={}
 
-    def wrapper(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-    return wrapper
-
-
-@singleton
-clss Foo(object):
-    pass
-
-foo1 = Foo()
-foo2 = Foo()
-
-print foo1 = foo2
-
-class Singleton(type):
-    """使用元类
-    """
-    def 
+#     def wrapper(*args, **kwargs):
+#         if cls not in instances:
+#             instances[cls] = cls(*args, **kwargs)
+#         return instances[cls]
+#     return wrapper
 
 
-def Foo(object):
-    __metaclass__ = Singleton
+# @singleton
+# clss Foo(object):
+#     pass
+
+# foo1 = Foo()
+# foo2 = Foo()
+
+# print(foo1 = foo2)
+
+# ### metaclass
+# class Singleton(type):
+#     """使用元类
+#     """
+#     _instance = {}
+#     def __call__(cls, *arg, **kwargs):
+#         if cls not in cls._instance:
+#             cls._instance[cls] = super(singleton, cls).__call__(*arg, **kwargs)
+#         return cls._instance[cls]
+
+# # python2
+# def Foo(object):
+#     __metaclass__ = Singleton
+
+# # python3
+# class myClass(metaclass=Singleton)
+#     pass
 
 
-class Singleton(object):
-    """new 使用基类
-    """
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, '_instance'):
-            cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+# # __new__ 基类实现
+# class Singleton(object):
+#     """new 使用基类
+#     """
+#     def __new__(cls, *args, **kwargs):xxx
+#         if not hasattr(cls, '_instance'):
+#             cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+#         return cls._instance
 
-class Foo(object):
-    pass
+# class Foo(object):
+#     pass
 
-foo1 = Foo()
-foo2 = Foo()
-
-print foo1 = foo2
+# foo1 = Foo()
+# print(dis.dis(Singleton))
+# foo2 = Foo()
+# print(foo1 = foo2)
 
 
 """
@@ -694,3 +658,52 @@ super() 方法
 # fjs = Wrap_Fjs(Fjs("fjs"))  
 # fjs.hello()  
 # fjs.fjs("fjs")  
+
+
+"""
+
+     Initialize the logging for IOK installer
+     __file__ is not recognized once built into .exe, use getcwd instead.
+
+"""
+# app_dir = os.getcwd()   # os.path.dirname(os.path.realpath(__file__))
+# log_dir = '%s\\%s\\' %(app_dir, iok_log_dir)
+# if not os.path.exists(log_dir):
+#     os.makedirs(log_dir)
+
+# log_file = log_dir + os.path.basename(sys.argv[0])
+# log_file = os.path.splitext(log_file)[0] + '.log'
+# log_file_old = log_file + ".old"
+
+# if os.path.exists(log_file):
+#     if os.path.exists(log_file_old):
+#         os.remove(log_file_old)
+#     os.rename(log_file, log_file_old)
+
+# logger = logging.getLogger(" PRO NAME ")
+# log_handler = logging.FileHandler(log_file)
+# log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+# log_handler.setFormatter(log_formatter)
+# logger.addHandler(log_handler)
+# logger.setLevel(logging.INFO)
+
+
+# """
+#     Verify if an IP is a valid IPv4 address
+# """
+# def valid_ip(address):
+#     try:
+#         socket.inet_aton(address)
+#         return True
+#     except:
+#         return False
+
+# """
+#     Copy directory recursively
+# """
+# def copy_files(src_dir, dst_dir):
+#     if os.path.exists(dst_dir):
+#         shutil.rmtree(dst_dir)
+
+#     shutil.copytree(src_dir, dst_dir)
+
