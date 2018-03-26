@@ -14,7 +14,7 @@ TemplateResponseMixin：故名思议，这个Mixin会加入Template的基本信�
 
 看了上面的三个类我们基本上能有一个清晰的认识了，Django中Mixin和View把原来的试图函数中的三个东西分开了，模板（TemplateResponseMixin），上下文数据（ContextMixin），负责将这些联系起来的一个东西（View）
 
-TemplateView：TemplateView就继承自TemplateResponseMixin，ContextMixin以及View，所以它的调用思路就很明确了，在其中定义一个get方法，然后通过get方法去将上面的三个东西联系在一起.我们可以看一下TemplateView的源代码
+TemplateView：TemplateView就继承自TemplateResponseMixin，ContextMixin以及View，所以它的调用思路就很明确了，在其中定义一个get方法，然后通过get方法去将上面的三个东西联系在一起
 
 Django 的URL 解析器将请求和关联的参数发送给一个可调用的函数而不是一个类，所以基于类的视图有一个as_view() 类方法用来作为类的可调用入口。
 
