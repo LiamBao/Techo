@@ -1,7 +1,109 @@
 # -*- coding:utf-8 -*-
 __author__ = 'liam_bao@163.com'
+__doc__ = 'examples for learning Python'
 import dis
 
+
+"""
+
+    lazy initialize设计模式
+
+"""
+#  decorator way
+import functools
+
+class lazy_attribute(object):
+    """ A property that caches itself to the class object. """
+
+    def __init__(self, func):
+        functools.update_wrapper(self, func, updated=[])
+        self.getter = func
+
+    def __get__(self, obj, cls):
+        value = self.getter(cls)
+        setattr(cls, self.__name__, value)
+        return value
+
+class test_lazy(object):
+    @lazy_attribute
+    def print_dict_string(clz):
+        print('print_dict_string is needed now')
+        return sum(i*i for i in range(1000))
+
+if __name__ == '__main__':
+    print(test_lazy.__dict__.get('print_dict_string'))
+    test_lazy.print_dict_string
+    print(test_lazy.__dict__.get('print_dict_string'))
+
+
+# 对象属性的lazy initialize
+
+
+
+"""
+
+    线程锁Lock & ThreadLocal
+    对于多线程来说，最大的特点就是线程之间可以共享数据，那么共享数据就会出现多线程同时更改一个变量，使用同样的资源，而出现死锁、数据错乱等情况
+    线程锁: 当访问某个资源之前，用Lock.acquire()锁住资源,访问之后，用Lock.release()释放资源
+    
+    多线程缺陷:
+    在Python中，有一个GIL，即全局解释锁，该锁的存在保证在同一个时间只能有一个线程执行任务，也就是多线程并不是真正的并发，只是交替得执行
+    假如有10个线程炮在10核CPU上，当前工作的也只能是一个CPU上的线程
+
+    虽然Python多线程有缺陷，但它很适合用在IO密集型任务中
+    I/O密集型执行期间大部分是时间都用在I/O上，如数据库I/O，较少时间用在CPU计算上.因此该应用场景可以使用Python多线程
+    当一个任务阻塞在IO操作上时，我们可以立即切换执行其他线程上执行其他IO操作请求
+
+"""
+# ## threading.Lock()
+# import threading
+# import time
+
+# a = 3
+# lock = threading.Lock()
+# def target():
+#     print('the curent threading  %s is running' % threading.current_thread().name)
+#     time.sleep(2)
+#     global a #使用global语句可以清楚地表明变量是在外面的块定义的
+#     lock.acquire()
+#     try:
+#         a += 3
+#     finally:
+#     #用finally的目的是防止当前线程无线占用资源
+#         lock.release()
+#     print('the curent threading  %s is ended' % threading.current_thread().name) 
+# t = threading.Thread(target=target)
+# t1 = threading.Thread(target=target)
+
+# t.start()
+# t1.start()
+# t.join()
+# t1.join()
+# print(a)
+
+# ## threadLocal
+# # v 属性只有本线程可以修改，其他线程不可以
+# from time import sleep
+# from random import random
+# from threading import Thread, local
+
+# data = local()
+
+# def bar():
+#     print("I'm called from", data.v)
+
+# def foo():
+#     bar()
+
+# class T(Thread):
+#     def run(self):
+#         sleep(random())
+#         data.v = self.getName()   # Thread-1 and Thread-2 accordingly
+#         sleep(1)
+#         foo()
+
+# T().start()
+# T().start()
 
 """==============>>>>>>>>>>>> Desgin Pattern STARTS <<<<<<================="""
 """
