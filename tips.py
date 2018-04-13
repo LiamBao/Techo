@@ -1,44 +1,71 @@
 # -*- coding:utf-8 -*-
 __author__ = 'liam_bao@163.com'
-__doc__ = 'examples for learning Python'
 import dis
 
 
 """
 
-    lazy initialize设计模式
+
 
 """
-#  decorator way
-import functools
-
-class lazy_attribute(object):
-    """ A property that caches itself to the class object. """
-
-    def __init__(self, func):
-        functools.update_wrapper(self, func, updated=[])
-        self.getter = func
-
-    def __get__(self, obj, cls):
-        value = self.getter(cls)
-        setattr(cls, self.__name__, value)
-        return value
-
-class test_lazy(object):
-    @lazy_attribute
-    def print_dict_string(clz):
-        print('print_dict_string is needed now')
-        return sum(i*i for i in range(1000))
-
-if __name__ == '__main__':
-    print(test_lazy.__dict__.get('print_dict_string'))
-    test_lazy.print_dict_string
-    print(test_lazy.__dict__.get('print_dict_string'))
 
 
-# 对象属性的lazy initialize
+
+"""
+
+    lazy initialize设计模式
+    http://www.cnblogs.com/xybaby/p/6280313.html
+
+"""
+# import functools
+# class lazy_attribute(object):
+#     """ A property that caches itself to the class object. """
+
+#     def __init__(self, func):
+#         functools.update_wrapper(self, func, updated=[])
+#         self.getter = func
+
+#     def __get__(self, obj, cls):
+#         value = self.getter(cls)
+#         setattr(cls, self.__name__, value)
+#         return value
+
+# class test_lazy(object):
+#     @lazy_attribute
+#     def print_dict_string(clz):
+#         print('print_dict_string is needed now')
+#         return sum(i*i for i in range(10))
+
+# if __name__ == '__main__':
+#     print(test_lazy.__dict__.get('print_dict_string'))
+#     test_lazy.print_dict_string
+#     print(test_lazy.__dict__.get('print_dict_string'))
 
 
+#__getattr__使得实现adapter wrapper模式非常容易，我们都知道“组合优于继承”，__getattr__实现的adapter就是以组合的形式
+# 如果adapter需要修改adapter_ext的行为，那么定义一个同名的属性就行了，其他的想直接“继承”的属性，通通交给__getattr__就行了
+# class adapter_ext(object):
+#     def foo(self):
+#         print('foo in adapter_ext')
+
+#     def bar(self):
+#         print('bar in adapter_ext')
+
+# class adapter(object):
+#     def __init__(self):
+#         self.adapter_ext = adapter_ext()
+
+#     def foo(self):
+#         print('foo in adapter') 
+#         self.adapter_ext.foo()
+
+#     def __getattr__(self, name):
+#         return getattr(self.adapter_ext, name)
+
+# if __name__ == '__main__':
+#     a = adapter()
+#     a.foo()
+#     a.bar()
 
 """
 
