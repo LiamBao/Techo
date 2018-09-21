@@ -2,14 +2,319 @@
 __author__ = 'liam_bao@163.com'
 import dis
 
+"""
+ 子类无法继承父类 __slot__
 
+"""
+
+"""
+    策略模式
+
+"""
+
+"""
+    上下文管理器
+
+    平常在写Python代码的时候，经常会用到with 来处理一个上下文环境，比如文件的打开关闭，数据库的连接关闭等等。
+
+    with语法的使用，需要我们处理的对象实现__enter__和__exit__两个魔术方法来支持。__enter__函数处理逻辑函
+    数之前需要做的事情，并返回操作对象作为as后面的变量，__exit__函数处理当代码离开with代码块以后的事情。
+
+    with语法非常方便的让我使用资源并且不用操心忘记后续操作所带来的隐患
+
+
+    contextlib 中的 contextmanager 作为装饰器来提供一种针对函数级别的上下文管理机制。
+
+    同时也支持编写协程时处理异步的上下文环境的asynccontextmanager装饰器。
+
+    @contextmanager
+    对于contextmanager装饰器的原理，通过阅读源码，我的理解是："插入式编码"。这里我有思考过和普通的装饰器怎么的不同，
+    我自己定义为普通的装饰器是"包裹式编码"，看一个装饰器的功能往往是从装饰角度由外向内观察逻辑，
+    而contextmanager却不同，它是"插入式"的，需要从函数出发由内向外观察。
+
+    怎么说是插入式呢？一个函数原本是自上向下顺序执行，突然在代码的中间，我们想要做点什么，
+    就把代码卡在这里，去做想做的事情，等做完了以后，再回来接着执行相应的代码。
+
+    要做到这一点，就借助到了yield关键字，contextmanager接受一个 Generator 来借助with ... as ..的语法特性，
+    在内部实现了__enter__和__exit__方法后，将yield返回的对象输出出去，这样就可以衔接上了。比较官方的用法是下面这样：
+
+    ```
+    @contextmanager
+    def some_generator():
+        # 这里处理之前的事情
+        try:
+            yield value#这里 yield 返回要操作的变量
+        finally:
+            # 这里处理之后的事情
+
+    with some_generator() as variable:
+        # 处理逻辑
+    ```
+    这样的写法执行顺序就等价于：
+
+    # 这里处理之前的事情
+    try:
+        variable = value
+        # 处理逻辑
+    finally:
+        # 这里处理之后的事情
+
+
+    @asynccontextmanager
+    asynccontextmanager装饰器和contextmanager类似，但其内部实现是通过async和await协程语法实现的，
+    所以它装饰的函数也必须是异步的实现。（这个语法支持需要python版本大于3.5）
+
+@asynccontextmanager
+async def get_connection():
+    conn = await acquire_db_connection()
+    try:
+        yield conn
+    finally:
+        await release_db_connection(conn)
+
+async def get_all_users():
+    async with get_connection() as conn:
+        return conn.query('SELECT ...')
+
+"""
+class MyContextManager(object):
+    
+    def __enter__(self):
+        print("Hello")
+        return self
+
+    def __exit__(self, *args):
+        print("Bye")
+
+    def work(self):
+        print("Do something...")
+
+with MyContextManager() as worker:
+    worker.work()
+
+
+"""
+    Python 调用机制
+    
+    For new-style classes, implicit invocations of special methods are only guaranteed 
+    to work correctly if defined on an object’s type, not in the object’s instance dictionary. 
+"""
+class A(object):
+    def __call__(self):
+        print("invoking __call__ from class A")
+
+a = A()
+a()
+
+a.__call__ = lambda: "invoking __call__ from lambda method"
+print(a.__call__())
+a()
+
+
+
+"""
+    分布式任务队列Celery
+
+    在程序运行过程中，要执行一个很久的任务，但是我们又不想主程序被阻塞，常见的方法是多线程。
+    可是当并发量过大时，多线程也会扛不住，必须要用线程池来限制并发个数，而且多线程对共享资源的使用也是很麻烦的事情.
+    还有是协程，但是协程毕竟还是在同一线程内执行的，如果一个任务本身就要执行很长时间，
+    而不是因为等待IO被挂起，那其他协程照样无法得到运行。
+    强大的分布式任务队列Celery，它可以让任务的执行同主程序完全脱离，甚至不在同一台主机内。
+    它通过队列来调度任务，不用担心并发量高时系统负载过大。
+    它可以用来处理复杂系统性能问题，却又相当灵活易用.
+
+"""
+
+
+"""
+
+        Mixin
+
+"""
+"""
+    Mixin，表示混入(mix-in)，它告诉别人，这个类是作为功能添加到子类中，而不是作为父类，它的作用同Java中的接口
+        首先它必须表示某一种功能，而不是某个物品，如同Java中的Runnable，Callable等
+        其次它必须责任单一，如果有多个功能，那就写多个Mixin类
+        然后，它不依赖于子类的实现
+        最后，子类即便没有继承这个Mixin类，也照样可以工作，就是缺少了某个功能。（比如飞机照样可以载客，就是不能飞了
+"""
+class Vehicle(object):
+    pass
+ 
+class PlaneMixin(object):
+    def fly(self):
+        print 'I am flying'
+ 
+class Airplane(Vehicle, PlaneMixin):
+    pass
+
+
+
+"""
+     AsynicI/O
+     使用事件循环驱动的协程实现并发.
+
+##Thinking outside the GIL with asnicIO and multiprocessing
+###impact 
+one binary
+fetccch the world
+process ecerything
+aggregate results
+thread pool for IO
+
+###not aging well
+scales in time and memeory
+runtime now too slow 
+underutilizing hardware
+ultimately limited by the GIL
+
+
+###Multiprocessing
+scacles of cpu cores
+autonatic IPC
+poolmaps is really useful
+one task per process
+beware forking, pickling
+
+###AsyncIO
+bease on futures
+faster than threads
+massive IO conccurrency
+processing still limited by GIL
+beware timeouts and queue length
 """
 
 
 
 """
 
+    Graph Theory
 
+"""
+
+"""shortest path """
+from collections import defaultdict
+from heapq import *
+
+def dijkstra(graph_dict, from_node, to_node):
+    cost = -1
+    Shortest_path=[]
+    q, seen = [(0,from_node,())], set()
+    while q:
+        (cost,v1,path) = heappop(q)
+        if v1 not in seen:
+            seen.add(v1)
+            path = (v1, path)
+            if v1 == to_node: # Find the to_node!!!
+                break;
+            for v2,c in graph_dict.get(v1, ()):
+                if v2 not in seen:
+                    heappush(q, (cost+c, v2, path))
+
+    # Check the way to quit 'while' loop
+    if v1 != to_node:
+        # IF there isn't a path from from_node to to_node, THEN return null!!!
+        print("node: %s cannot reach node: %s" %(from_node,to_node))
+        cost = -1
+        Shortest_path=[]
+        return cost,Shortest_path
+    else:
+        # IF there is a path from from_node to to_node, THEN format the path and return!!!
+        left = path[0]
+        Shortest_path.append(left)
+        right = path[1]
+        while len(right)>0:
+            left = right[0]
+            Shortest_path.append(left)
+            right = right[1]
+        Shortest_path.reverse()
+        
+    return cost,Shortest_path
+
+def dijkstra_all(graph_dict):
+    Shortest_path_dict = defaultdict(dict)
+    for i in nodes:
+        for j in nodes:
+            if i != j:
+                cost,Shortest_path = dijkstra(graph_dict,i,j)
+                Shortest_path_dict[i][j] = Shortest_path
+                
+    return Shortest_path_dict
+
+nodes=['s1','s2','s3','s4','s5','s6']
+print("nodes =",nodes)
+M=float("inf")
+# Describing graph by 2-D list
+graph_list = [  
+[0,30,15,M,M,M],  
+[5,0,M,M,20,30],  
+[M,10,0,M,M,15],  
+[M,M,M,0,M,M],  
+[M,M,M,10,0,M],  
+[M,M,M,30,10,0]  
+]
+print("graph_list = [")
+for l in graph_list:
+    print(str(l)+",")
+print("]\n")
+
+# Describing graph by a list of tuple
+graph_edges = []
+print ("graph_edges = [")
+for i in nodes:
+    for j in nodes:
+        if i!=j and graph_list[nodes.index(i)][nodes.index(j)]!=M:
+            graph_edges.append((i,j,graph_list[nodes.index(i)][nodes.index(j)]))
+            print (str((i,j,graph_list[nodes.index(i)][nodes.index(j)]))+", ",end="")
+    print()
+print("]\n")
+
+# Describing graph by dict
+graph_dict = defaultdict(list)
+print("graph_dict = {")
+for tail,head,cost in graph_edges:
+    graph_dict[tail].append((head,cost))
+for key in graph_dict:
+    print("'%s': %s" %(key, graph_dict[key]))
+print("}\n")
+
+print ("----------------Dijkstra----------------")
+#from_node = input ("Please input the from_node =  ")
+#to_node = input("Please input the to_node = ")
+#cost,Shortest_path = dijkstra(graph_dict, from_node, to_node)
+#print ('The shortest path = %s, cost = %s'%(Shortest_path,cost))
+Shortest_path_dict = dijkstra_all(graph_dict)
+print("Shortest_path_dict = {")
+for key in Shortest_path_dict:
+    print("'%s': %s," %(key, Shortest_path_dict[key]))
+print("}")
+
+
+
+"""
+
+    setup logging
+
+"""
+import logging
+from logging.handlers import RotatingFileHandler
+
+def setup_logging():
+    formatter = logging.Formatter(settings.LOG_FORMAT)
+    logger = logging.getLogger()
+    logger.setLevel(settings.LOG_LEVEL)
+    handler = RotatingFileHandler(filename=settings.LOG_FILE, maxBytes=(1048576*5), backupCount=7)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+setup_logging()
+
+def all_settings():
+    from types import ModuleType
+    settings = {}
+    for name, item in globals().iteritems():
+        if not callable(item) and not name.startswith("__") and not isinstance(item, ModuleType):
+            settings[name] = item
+    return settings
 
 """
 
@@ -17,55 +322,55 @@ import dis
     http://www.cnblogs.com/xybaby/p/6280313.html
 
 """
-# import functools
-# class lazy_attribute(object):
-#     """ A property that caches itself to the class object. """
+import functools
+class lazy_attribute(object):
+    """ A property that caches itself to the class object. """
 
-#     def __init__(self, func):
-#         functools.update_wrapper(self, func, updated=[])
-#         self.getter = func
+    def __init__(self, func):
+        functools.update_wrapper(self, func, updated=[])
+        self.getter = func
 
-#     def __get__(self, obj, cls):
-#         value = self.getter(cls)
-#         setattr(cls, self.__name__, value)
-#         return value
+    def __get__(self, obj, cls):
+        value = self.getter(cls)
+        setattr(cls, self.__name__, value)
+        return value
 
-# class test_lazy(object):
-#     @lazy_attribute
-#     def print_dict_string(clz):
-#         print('print_dict_string is needed now')
-#         return sum(i*i for i in range(10))
+class test_lazy(object):
+    @lazy_attribute
+    def print_dict_string(clz):
+        print('print_dict_string is needed now')
+        return sum(i*i for i in range(10))
 
-# if __name__ == '__main__':
-#     print(test_lazy.__dict__.get('print_dict_string'))
-#     test_lazy.print_dict_string
-#     print(test_lazy.__dict__.get('print_dict_string'))
+if __name__ == '__main__':
+    print(test_lazy.__dict__.get('print_dict_string'))
+    test_lazy.print_dict_string
+    print(test_lazy.__dict__.get('print_dict_string'))
 
-
-#__getattr__使得实现adapter wrapper模式非常容易，我们都知道“组合优于继承”，__getattr__实现的adapter就是以组合的形式
+# __getattr__使得实现adapter wrapper模式非常容易，我们都知道“组合优于继承”，__getattr__实现的adapter就是以组合的形式
 # 如果adapter需要修改adapter_ext的行为，那么定义一个同名的属性就行了，其他的想直接“继承”的属性，通通交给__getattr__就行了
-# class adapter_ext(object):
-#     def foo(self):
-#         print('foo in adapter_ext')
 
-#     def bar(self):
-#         print('bar in adapter_ext')
+class adapter_ext(object):
+    def foo(self):
+        print('foo in adapter_ext')
 
-# class adapter(object):
-#     def __init__(self):
-#         self.adapter_ext = adapter_ext()
+    def bar(self):
+        print('bar in adapter_ext')
 
-#     def foo(self):
-#         print('foo in adapter') 
-#         self.adapter_ext.foo()
+class adapter(object):
+    def __init__(self):
+        self.adapter_ext = adapter_ext()
 
-#     def __getattr__(self, name):
-#         return getattr(self.adapter_ext, name)
+    def foo(self):
+        print('foo in adapter') 
+        self.adapter_ext.foo()
 
-# if __name__ == '__main__':
-#     a = adapter()
-#     a.foo()
-#     a.bar()
+    def __getattr__(self, name):
+        return getattr(self.adapter_ext, name)
+
+if __name__ == '__main__':
+    a = adapter()
+    a.foo()
+    a.bar()
 
 """
 
@@ -82,55 +387,55 @@ import dis
     当一个任务阻塞在IO操作上时，我们可以立即切换执行其他线程上执行其他IO操作请求
 
 """
-# ## threading.Lock()
-# import threading
-# import time
+## threading.Lock()
+import threading
+import time
 
-# a = 3
-# lock = threading.Lock()
-# def target():
-#     print('the curent threading  %s is running' % threading.current_thread().name)
-#     time.sleep(2)
-#     global a #使用global语句可以清楚地表明变量是在外面的块定义的
-#     lock.acquire()
-#     try:
-#         a += 3
-#     finally:
-#     #用finally的目的是防止当前线程无线占用资源
-#         lock.release()
-#     print('the curent threading  %s is ended' % threading.current_thread().name) 
-# t = threading.Thread(target=target)
-# t1 = threading.Thread(target=target)
+a = 3
+lock = threading.Lock()
+def target():
+    print('the curent threading  %s is running' % threading.current_thread().name)
+    time.sleep(2)
+    global a #使用global语句可以清楚地表明变量是在外面的块定义的
+    lock.acquire()
+    try:
+        a += 3
+    finally:
+    #用finally的目的是防止当前线程无线占用资源
+        lock.release()
+    print('the curent threading  %s is ended' % threading.current_thread().name) 
+t = threading.Thread(target=target)
+t1 = threading.Thread(target=target)
 
-# t.start()
-# t1.start()
-# t.join()
-# t1.join()
-# print(a)
+t.start()
+t1.start()
+t.join()
+t1.join()
+print(a)
 
-# ## threadLocal
-# # v 属性只有本线程可以修改，其他线程不可以
-# from time import sleep
-# from random import random
-# from threading import Thread, local
+## threadLocal
+v 属性只有本线程可以修改，其他线程不可以
+from time import sleep
+from random import random
+from threading import Thread, local
 
-# data = local()
+data = local()
 
-# def bar():
-#     print("I'm called from", data.v)
+def bar():
+    print("I'm called from", data.v)
 
-# def foo():
-#     bar()
+def foo():
+    bar()
 
-# class T(Thread):
-#     def run(self):
-#         sleep(random())
-#         data.v = self.getName()   # Thread-1 and Thread-2 accordingly
-#         sleep(1)
-#         foo()
+class T(Thread):
+    def run(self):
+        sleep(random())
+        data.v = self.getName()   # Thread-1 and Thread-2 accordingly
+        sleep(1)
+        foo()
 
-# T().start()
-# T().start()
+T().start()
+T().start()
 
 """==============>>>>>>>>>>>> Desgin Pattern STARTS <<<<<<================="""
 """
@@ -138,62 +443,62 @@ import dis
     单例模式SINGLETON
 
 """
-# def singleton(cls):
-#     """decorator 方法
-#     """
-#     instances ={}
+def singleton(cls):
+    """decorator 方法
+    """
+    instances ={}
 
-#     def wrapper(*args, **kwargs):
-#         if cls not in instances:
-#             instances[cls] = cls(*args, **kwargs)
-#         return instances[cls]
-#     return wrapper
-
-
-# @singleton
-# clss Foo(object):
-#     pass
-
-# foo1 = Foo()
-# foo2 = Foo()
-
-# print(foo1 = foo2)
-
-# ### metaclass
-# class Singleton(type):
-#     """使用元类
-#     """
-#     _instance = {}
-#     def __call__(cls, *arg, **kwargs):
-#         if cls not in cls._instance:
-#             cls._instance[cls] = super(singleton, cls).__call__(*arg, **kwargs)
-#         return cls._instance[cls]
-
-# # python2
-# def Foo(object):
-#     __metaclass__ = Singleton
-
-# # python3
-# class myClass(metaclass=Singleton)
-#     pass
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return wrapper
 
 
-# # __new__ 基类实现
-# class Singleton(object):
-#     """new 使用基类
-#     """
-#     def __new__(cls, *args, **kwargs):xxx
-#         if not hasattr(cls, '_instance'):
-#             cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
-#         return cls._instance
+@singleton
+clss Foo(object):
+    pass
 
-# class Foo(object):
-#     pass
+foo1 = Foo()
+foo2 = Foo()
 
-# foo1 = Foo()
-# print(dis.dis(Singleton))
-# foo2 = Foo()
-# print(foo1 = foo2)
+print(foo1 = foo2)
+
+### metaclass
+class Singleton(type):
+    """使用元类
+    """
+    _instance = {}
+    def __call__(cls, *arg, **kwargs):
+        if cls not in cls._instance:
+            cls._instance[cls] = super(singleton, cls).__call__(*arg, **kwargs)
+        return cls._instance[cls]
+
+# python2
+def Foo(object):
+    __metaclass__ = Singleton
+
+# python3
+class myClass(metaclass=Singleton)
+    pass
+
+
+# __new__ 基类实现
+class Singleton(object):
+    """new 使用基类
+    """
+    def __new__(cls, *args, **kwargs):xxx
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+class Foo(object):
+    pass
+
+foo1 = Foo()
+print(dis.dis(Singleton))
+foo2 = Foo()
+print(foo1 = foo2)
 
 
 """
@@ -248,137 +553,137 @@ import dis
     主题（Subject）是被观察的对象，而其所有依赖者（Observer）称为观察者
 
 """
-# class Publisher(object):
-#     """创建一个发布者 Publisher，他是作为事件发布对象的抽象
-#     创建了一个用于存放所有观察者对象的list,add remove方法用于 新增/移除 观察者对象
-#     而notify方法就是将由事件触发的消息发送给每个观察者,并调用观察者自己的notify方法进行操作
-#     这是实现观察者模式的核心
-#     """ 
-#     def __init__(self):
-#         self.observers = list()
+class Publisher(object):
+    """创建一个发布者 Publisher，他是作为事件发布对象的抽象
+    创建了一个用于存放所有观察者对象的list,add remove方法用于 新增/移除 观察者对象
+    而notify方法就是将由事件触发的消息发送给每个观察者,并调用观察者自己的notify方法进行操作
+    这是实现观察者模式的核心
+    """ 
+    def __init__(self):
+        self.observers = list()
 
-#     def add(self, observers):
-#         if observers in self.observers:
-#             print('fail to add: {}'.format(observers))
-#         else:
-#             self.observers.append(observers)
+    def add(self, observers):
+        if observers in self.observers:
+            print('fail to add: {}'.format(observers))
+        else:
+            self.observers.append(observers)
 
-#     def remove(self, observers):
-#         try:
-#             self.observers.remove(observers)
-#         except Exception as e:
-#             print('fail to remove: {}, {}'.format(observers, e))
+    def remove(self, observers):
+        try:
+            self.observers.remove(observers)
+        except Exception as e:
+            print('fail to remove: {}, {}'.format(observers, e))
 
-#     def notify(self):
-#         [o.notify(self) for o in self.observers]
+    def notify(self):
+        [o.notify(self) for o in self.observers]
 
-# class DefaultFormatter(Publisher):
-#     """创建一个实际的事件发布对象，这个对象就是事件最初触发的位置
-#     发布对象需要继承自发布者，并且在__init__方法中要做的第一件事情就是调用基类的__init__方法
-#     在事件触发的位置，要调用 notify 方法，本例中是对 data 复制的 setter 中调用的，
-#     如果在事件触发的位置不调用，那么观察者模式就失去了其意义，自然也就不是观察者模式了
-#     """
-#     def __init__(self, name):
-#         Publisher.__init__(self)
-#         self.name = name
-#         self._data = 0
+class DefaultFormatter(Publisher):
+    """创建一个实际的事件发布对象，这个对象就是事件最初触发的位置
+    发布对象需要继承自发布者，并且在__init__方法中要做的第一件事情就是调用基类的__init__方法
+    在事件触发的位置，要调用 notify 方法，本例中是对 data 复制的 setter 中调用的，
+    如果在事件触发的位置不调用，那么观察者模式就失去了其意义，自然也就不是观察者模式了
+    """
+    def __init__(self, name):
+        Publisher.__init__(self)
+        self.name = name
+        self._data = 0
 
-#     def __str__(self):
-#         return '{}: "{}" has data = {}'.format(type(self).__name__, self.name, self._data)
+    def __str__(self):
+        return '{}: "{}" has data = {}'.format(type(self).__name__, self.name, self._data)
 
-#     @property
-#     def data(self):
-#         return self._data
+    @property
+    def data(self):
+        return self._data
 
-#     @data.setter
-#     def data(self, new_value):
-#         try:
-#             self._data = int(new_value)
-#         except Exception as e:
-#             print('Error: {}'.format(e))
-#         else:
-#             self.notify()
+    @data.setter
+    def data(self, new_value):
+        try:
+            self._data = int(new_value)
+        except Exception as e:
+            print('Error: {}'.format(e))
+        else:
+            self.notify()
 
-# class HexFormatter(object):  
-#     def notify(self, publisher):
-#         print("{}: '{}' has now hex data = {}".format(type(self).__name__,publisher.name, hex(publisher.data)))
+class HexFormatter(object):  
+    def notify(self, publisher):
+        print("{}: '{}' has now hex data = {}".format(type(self).__name__,publisher.name, hex(publisher.data)))
 
-# class BinaryFormatter(object):  
-#     def notify(self, publisher):
-#         print("{}: '{}' has now bin data = {}".format(type(self).__name__,publisher.name, bin(publisher.data)))  
+class BinaryFormatter(object):  
+    def notify(self, publisher):
+        print("{}: '{}' has now bin data = {}".format(type(self).__name__,publisher.name, bin(publisher.data)))  
 
-# def main():  
-#     df = DefaultFormatter('test1')
-#     print(df)
-#     cf = DefaultFormatter('test2')
-#     print(cf)
+def main():  
+    df = DefaultFormatter('test1')
+    print(df)
+    cf = DefaultFormatter('test2')
+    print(cf)
 
-#     print()
-#     hf = HexFormatter()
-#     df.add(hf)
-#     df.data = 3
+    print()
+    hf = HexFormatter()
+    df.add(hf)
+    df.data = 3
 
-#     cf.add(hf)
-#     cf.data = 16
-#     print(df)
-#     print(cf)
+    cf.add(hf)
+    cf.data = 16
+    print(df)
+    print(cf)
 
-#     print()
-#     bf = BinaryFormatter()
-#     df.add(bf)
-#     df.data = 21
-#     cf.add(bf)
-#     cf.data = 16
-#     print(df)
-#     print(cf)
+    print()
+    bf = BinaryFormatter()
+    df.add(bf)
+    df.data = 21
+    cf.add(bf)
+    cf.data = 16
+    print(df)
+    print(cf)
 
-#     print()
-#     df.remove(hf)
-#     df.data = 40
-#     cf.data = 1024
-#     print(df)
-#     print(cf)
+    print()
+    df.remove(hf)
+    df.data = 40
+    cf.data = 1024
+    print(df)
+    print(cf)
 
-#     print()
-#     df.remove(hf)
-#     df.add(bf)
+    print()
+    df.remove(hf)
+    df.add(bf)
 
-#     df.data = 'hello'
-#     cf.add(bf)
-#     print(df)
-#     print(cf)
+    df.data = 'hello'
+    cf.add(bf)
+    print(df)
+    print(cf)
 
-#     print()
-#     df.data = 15.8
-#     print(df)
-#     cf.data = 32
-#     print(cf)
+    print()
+    df.data = 15.8
+    print(df)
+    cf.data = 32
+    print(cf)
 
-# if __name__ == '__main__':  
-#     main()
+if __name__ == '__main__':  
+    main()
 
 """
 
     class 类装饰器作为方法调用次数校验
 
 """
-# class Counter:
-#     def __init__(self, func):
-#         self.func = func
-#         self.count = 0
+class Counter:
+    def __init__(self, func):
+        self.func = func
+        self.count = 0
 
-#     def __call__(self, *args, **kwargs):
-#         self.count += 1
-#         return self.func(*args, **kwargs)
+    def __call__(self, *args, **kwargs):
+        self.count += 1
+        return self.func(*args, **kwargs)
 
-# @Counter
-# def foo():
-#     pass
+@Counter
+def foo():
+    pass
 
-# for i in range(10):
-#     foo()
+for i in range(10):
+    foo()
 
-# print(foo.count)
+print(foo.count)
 """==============>>>>>>>>>>>>  Desgin Pattern ENDS <<<<<<<<<<<<<<<============"""
 
 
@@ -386,23 +691,23 @@ import dis
 
     "is"  vs  "=="
 
-"""
-# "is" checks that 2 arguments refer to the same object, "==" checks that 2 arguments have the same value.
-# is比较的是id是不是一样，==比较的是值是不是一样
-# 每个对象包含3个属性，id，type，value
-# id就是对象地址，可以通过内置函数id()查看对象引用的地址
-# type就是对象类型，可以通过内置函数type()查看对象的类型
-# value就是对象的值
-# python为了实现对内存的有效利用，对小整数[-5,256]内的整数会进行缓存，不在该范围内的则不会缓存
-# >>> a = 255
-# >>> b = 255
-# >>> a is b
-# True
-# >>> c = 257
-# >>> d = 257
-# >>> c is d
-# False
+"is" checks that 2 arguments refer to the same object, "==" checks that 2 arguments have the same value.
+is比较的是id是不是一样，==比较的是值是不是一样
+每个对象包含3个属性，id，type，value
+id就是对象地址，可以通过内置函数id()查看对象引用的地址
+type就是对象类型，可以通过内置函数type()查看对象的类型
+value就是对象的值
+python为了实现对内存的有效利用，对小整数[-5,256]内的整数会进行缓存，不在该范围内的则不会缓存
+>>> a = 255
+>>> b = 255
+>>> a is b
+True
+>>> c = 257
+>>> d = 257
+>>> c is d
+False
 
+"""
 
 """
 
@@ -415,29 +720,29 @@ import dis
         - isinstance可以判断子类对象是否继承于父类；而type不可以
 
 """
-# from timeit import timeit
-# from dis import dis
+from timeit import timeit
+from dis import dis
 
-# #用type和isinstance分别判断{'s'}是否属于set类型
-# def a():return type({'s'})is set
-# def b():return isinstance({'s'},set)
-# def c():return type({'s'})==set
+#用type和isinstance分别判断{'s'}是否属于set类型
+def a():return type({'s'})is set
+def b():return isinstance({'s'},set)
+def c():return type({'s'})==set
 
-# time = [timeit(a),timeit(b),timeit(c)]
+time = [timeit(a),timeit(b),timeit(c)]
 
-# #打印结果
-# print('result:\n%s %s %s\n'%(a(),b(),c()))
+#打印结果
+print('result:\n%s %s %s\n'%(a(),b(),c()))
 
-# #打印时间
-# print('time:\n%s\n'%( ''.join([str(_)+'\n' for _ in time]) )) 
+#打印时间
+print('time:\n%s\n'%( ''.join([str(_)+'\n' for _ in time]) )) 
 
-# #打印指令
-# print('orders:\n') 
-# dis(a)
-# print( '\n')
-# dis(b)
-# print( '\n')
-# dis(c)
+#打印指令
+print('orders:\n') 
+dis(a)
+print( '\n')
+dis(b)
+print( '\n')
+dis(c)
 
 
 #=============>>>>   Decorator STARTS
@@ -445,6 +750,10 @@ import dis
 # http://blog.xiayf.cn/2013/01/04/Decorators-and-Functional-Python/
 
 """
+    装饰器是可以调用的对象,其参数是另一个函数(被装饰的函数). 装饰器可能会处理被装饰的函数,然后将其返回,
+        或者将其替换成另外一个函数或可调用对象.
+
+    除了在装饰器中有用处之外,闭包还是回调式异步编程和函数式编程的基础.
 
      Pass a function object through another function and assign the result to the original function
 
@@ -459,22 +768,22 @@ import dis
      The reason I think decorators will have such a big impact is because this little bit of syntax sugar changes the way you think about programming. Indeed, it brings the idea of “applying code to other code” (i.e.: macros) into mainstream thinking by formalizing it as a language construct.
 
 """
-# class my_decorator(object):
+class my_decorator(object):
 
-#     def __init__(self, f):
-#         print("inside my_decorator.__init__()")
-#         f() # Prove that function definition has completed
+    def __init__(self, f):
+        print("inside my_decorator.__init__()")
+        f() # Prove that function definition has completed
 
-#     def __call__(self):
-#         print("inside my_decorator.__call__()")
+    def __call__(self):
+        print("inside my_decorator.__call__()")
 
-# @my_decorator
-# def aFunction():
-#     print("inside aFunction()")
+@my_decorator
+def aFunction():
+    print("inside aFunction()")
 
-# print("Finished decorating aFunction()")
+print("Finished decorating aFunction()")
 
-# aFunction()
+aFunction()
 
 
 """
@@ -482,22 +791,22 @@ import dis
     Slightly More Useful
 
 """
-# class entry_exit(object):
+class entry_exit(object):
 
-#     def __init__(self, f):
-#         print("decorator class __init__")
-#         self.f = f
+    def __init__(self, f):
+        print("decorator class __init__")
+        self.f = f
 
-#     def __call__(self):
-#         print("Entering", self.f.__name__)
-#         self.f()
-#         print("Exited", self.f.__name__)
+    def __call__(self):
+        print("Entering", self.f.__name__)
+        self.f()
+        print("Exited", self.f.__name__)
 
-# @entry_exit
-# def func1():
-#     print("inside func1()")
-# print("func start ")
-# func1()
+@entry_exit
+def func1():
+    print("inside func1()")
+print("func start ")
+func1()
 
 """
 
@@ -516,39 +825,39 @@ import dis
     Flask sessions 实现
 
 """
-# from flask import Flask, session, redirect, url_for, escape, request
+from flask import Flask, session, redirect, url_for, escape, request
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
-# @app.route('/')
-# def index():
-#     if 'username' in session:
-#         return 'Logged in as %s' % escape(session['username'])
-#     return 'You are not logged in'
+@app.route('/')
+def index():
+    if 'username' in session:
+        return 'Logged in as %s' % escape(session['username'])
+    return 'You are not logged in'
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         session['username'] = request.form['username']
-#         return redirect(url_for('index'))
-#     return '''
-#         <form action="" method="post">
-#             <p><input type=text name=username>
-#             <p><input type=submit value=Login>
-#         </form>
-#     '''
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session['username'] = request.form['username']
+        return redirect(url_for('index'))
+    return '''
+        <form action="" method="post">
+            <p><input type=text name=username>
+            <p><input type=submit value=Login>
+        </form>
+    '''
 
-# @app.route('/logout')
-# def logout():
-#     # remove the username from the session if it's there
-#     session.pop('username', None)
-#     return redirect(url_for('index'))
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
-# # set the secret key.  keep this really secret:
-# app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+# set the secret key.  keep this really secret:
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-# if __name__ == '__main__':
-#     app.run()
+if __name__ == '__main__':
+    app.run()
 
 
 """ ===========>>>>>>>>>> Magic Functions STARTS 
@@ -569,21 +878,21 @@ import dis
 
 """
 
-# class Test:
-#       def __getattr__(self, name):
-#          print('__getattr__')
+class Test:
+      def __getattr__(self, name):
+         print('__getattr__')
  
-#       def __getattribute__(self, name):
-#          print('__getattribute__')
+      def __getattribute__(self, name):
+         print('__getattribute__')
  
-#       def __setattr__(self, name, value):
-#          print('__setattr__')
+      def __setattr__(self, name, value):
+         print('__setattr__')
  
-#       def __delattr__(self, name):
-#          print('__delattr__')
+      def __delattr__(self, name):
+         print('__delattr__')
 
-# t= Test()
-# t.x
+t= Test()
+t.x
 
 """
 如上述代码所示，x并不是Test类实例t的一个属性，首先去调用 __getattribute__() 方法，得知该属性并不属于该实例对象；但是，按照常理，t.x应该打印 __getattribute__ 和__getattr__，但实际情况并非如此，为什么呢？难道以上Python的规定无效吗？
@@ -608,45 +917,45 @@ import dis
 
 方法一：采用object（所有类的基类）
 """
-# class Test:
-#       def __getattr__(self, name):
-#          print('__getattr__')
+class Test:
+      def __getattr__(self, name):
+         print('__getattr__')
  
-#       def __getattribute__(self, name):
-#          print('__getattribute__')
-#          object.__getattribute__(self, name)
+      def __getattribute__(self, name):
+         print('__getattribute__')
+         object.__getattribute__(self, name)
  
-#       def __setattr__(self, name, value):
-#          print('__setattr__')
+      def __setattr__(self, name, value):
+         print('__setattr__')
  
-#       def __delattr__(self, name):
-#          print('__delattr__')
+      def __delattr__(self, name):
+         print('__delattr__')
 
-# t= Test()
-# t.x
+t= Test()
+t.x
 
 
 """
 super() 方法
 """
-# class Test:
-#       def __getattr__(self, name):
-#          print('__getattr__')
+class Test:
+      def __getattr__(self, name):
+         print('__getattr__')
  
-#       def __getattribute__(self, name):
-#          print('__getattribute__')
-#         #super(Test, self).__getattribute__(name)
-# # OR
-#          super().__getattribute__(name)
+      def __getattribute__(self, name):
+         print('__getattribute__')
+        #super(Test, self).__getattribute__(name)
+# OR
+         super().__getattribute__(name)
  
-#       def __setattr__(self, name, value):
-#          print('__setattr__')
+      def __setattr__(self, name, value):
+         print('__setattr__')
  
-#       def __delattr__(self, name):
-#          print('__delattr__')
+      def __delattr__(self, name):
+         print('__delattr__')
 
-# t= Test()
-# t.x
+t= Test()
+t.x
 """ ===========<<<<<<<<<< Magic Functions ENDS  """
 
 
@@ -666,64 +975,64 @@ super() 方法
 
 """ 
 # 经典类
-# class A():
-#     def __init__(self):
-#         print('A')
+class A():
+    def __init__(self):
+        print('A')
 
-# class B(A):
-#     def __init__(self):
-#         A.__init__(self)
-#         print('B')
+class B(A):
+    def __init__(self):
+        A.__init__(self)
+        print('B')
 
-# class C(B, A):
-#     def __init__(self):
-#         A.__init__(self)
-#         B.__init__(self)
-#         print('C')
+class C(B, A):
+    def __init__(self):
+        A.__init__(self)
+        B.__init__(self)
+        print('C')
 
-# c= C()
+c= C()
 
 
 # 新式类
-# class A(object):
-#     def __init__(self):
-#         print('A')
+class A(object):
+    def __init__(self):
+        print('A')
 
-# class B(A):
-#     def __init__(self):
-#         super(B, self).__init__()
-#         print('B')
+class B(A):
+    def __init__(self):
+        super(B, self).__init__()
+        print('B')
 
-# class C(B, A):
-#     def __init__(self):
-#         super(C, self).__init__()
-#         print('C')
+class C(B, A):
+    def __init__(self):
+        super(C, self).__init__()
+        print('C')
 
-# c = C()
+c = C()
 
 
 # 解决父类不能初始化问题
-# class Person(object):
-#     name = ""
-#     sex = ""
-#     def __init__(self, name, sex='U'):
-#         print( 'Person')
-#         self.name=name
-#         self.sex=sex
+class Person(object):
+    name = ""
+    sex = ""
+    def __init__(self, name, sex='U'):
+        print( 'Person')
+        self.name=name
+        self.sex=sex
 
-# class Consumer(object):
-#     def __init__(self):
-#         print('Consumer')
+class Consumer(object):
+    def __init__(self):
+        print('Consumer')
     
-# class Student(Person, Consumer):
-#     def __init__(self, score, name):
-#         print(Student.__bases__)
-#         super(Student, self).__init__(name, sex='F')
-#         Consumer.__init__(self)
-#         self.score=score
+class Student(Person, Consumer):
+    def __init__(self, score, name):
+        print(Student.__bases__)
+        super(Student, self).__init__(name, sex='F')
+        Consumer.__init__(self)
+        self.score=score
 
-# s1 = Student(90, 'abc')
-# print(s1.name, s1.score, s1.sex, s1.__class__.__mro__)
+s1 = Student(90, 'abc')
+print(s1.name, s1.score, s1.sex, s1.__class__.__mro__)
 
 
 """
@@ -732,25 +1041,25 @@ super() 方法
 
 """
 
-# class People(object):
+class People(object):
 
-#     def __init__(self, age, name):
-#         self.age = age
-#         self.name = name
+    def __init__(self, age, name):
+        self.age = age
+        self.name = name
 
-#     def __getattribute__(self, obj):
-#         if obj == 'age':
-#             print("Age was asked")
-#             return object.__getattribute__(self, obj)
-#         elif obj == 'name':
-#             print('Name was asked')
-#             return object.__getattribute__(self, obj)
-#         else:
-#             return object.__getattribute__(self, obj)
+    def __getattribute__(self, obj):
+        if obj == 'age':
+            print("Age was asked")
+            return object.__getattribute__(self, obj)
+        elif obj == 'name':
+            print('Name was asked')
+            return object.__getattribute__(self, obj)
+        else:
+            return object.__getattribute__(self, obj)
 
-# p1 = People(13, 'liam')
-# print(p1.age)
-# print(p1.name)
+p1 = People(13, 'liam')
+print(p1.age)
+print(p1.name)
 
 
 """
@@ -759,34 +1068,34 @@ super() 方法
 
 """
 
-# class Fjs(object):  
+class Fjs(object):  
 
-#     def __init__(self, name):  
-#         self.name = name  
+    def __init__(self, name):  
+        self.name = name  
   
-#     def hello(self):  
-#         print("said by : "+self.name)
+    def hello(self):  
+        print("said by : "+self.name)
   
-#     def fjs(self, name):  
-#         if name == self.name:  
-#             print("yes")  
-#         else:  
-#             print("no")
+    def fjs(self, name):  
+        if name == self.name:  
+            print("yes")  
+        else:  
+            print("no")
   
-# class Wrap_Fjs(object):  
-#     def __init__(self, fjs):  
-#         self._fjs = fjs  
+class Wrap_Fjs(object):  
+    def __init__(self, fjs):  
+        self._fjs = fjs  
   
-#     def __getattr__(self, item):  
-#         if item == "hello":  
-#             print("调用hello方法了")
-#         elif item == "fjs":  
-#             print("调用fjs方法了")
-#         return getattr(self._fjs, item)  
+    def __getattr__(self, item):  
+        if item == "hello":  
+            print("调用hello方法了")
+        elif item == "fjs":  
+            print("调用fjs方法了")
+        return getattr(self._fjs, item)  
   
-# fjs = Wrap_Fjs(Fjs("fjs"))  
-# fjs.hello()  
-# fjs.fjs("fjs")  
+fjs = Wrap_Fjs(Fjs("fjs"))  
+fjs.hello()  
+fjs.fjs("fjs")  
 
 
 """
@@ -795,44 +1104,44 @@ super() 方法
      __file__ is not recognized once built into .exe, use getcwd instead.
 
 """
-# app_dir = os.getcwd()   # os.path.dirname(os.path.realpath(__file__))
-# log_dir = '%s\\%s\\' %(app_dir, iok_log_dir)
-# if not os.path.exists(log_dir):
-#     os.makedirs(log_dir)
+app_dir = os.getcwd()   # os.path.dirname(os.path.realpath(__file__))
+log_dir = '%s\\%s\\' %(app_dir, iok_log_dir)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
-# log_file = log_dir + os.path.basename(sys.argv[0])
-# log_file = os.path.splitext(log_file)[0] + '.log'
-# log_file_old = log_file + ".old"
+log_file = log_dir + os.path.basename(sys.argv[0])
+log_file = os.path.splitext(log_file)[0] + '.log'
+log_file_old = log_file + ".old"
 
-# if os.path.exists(log_file):
-#     if os.path.exists(log_file_old):
-#         os.remove(log_file_old)
-#     os.rename(log_file, log_file_old)
+if os.path.exists(log_file):
+    if os.path.exists(log_file_old):
+        os.remove(log_file_old)
+    os.rename(log_file, log_file_old)
 
-# logger = logging.getLogger(" PRO NAME ")
-# log_handler = logging.FileHandler(log_file)
-# log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-# log_handler.setFormatter(log_formatter)
-# logger.addHandler(log_handler)
-# logger.setLevel(logging.INFO)
+logger = logging.getLogger(" PRO NAME ")
+log_handler = logging.FileHandler(log_file)
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+log_handler.setFormatter(log_formatter)
+logger.addHandler(log_handler)
+logger.setLevel(logging.INFO)
 
 
-# """
-#     Verify if an IP is a valid IPv4 address
-# """
-# def valid_ip(address):
-#     try:
-#         socket.inet_aton(address)
-#         return True
-#     except:
-#         return False
+"""
+    Verify if an IP is a valid IPv4 address
+"""
+def valid_ip(address):
+    try:
+        socket.inet_aton(address)
+        return True
+    except:
+        return False
 
-# """
-#     Copy directory recursively
-# """
-# def copy_files(src_dir, dst_dir):
-#     if os.path.exists(dst_dir):
-#         shutil.rmtree(dst_dir)
+"""
+    Copy directory recursively
+"""
+def copy_files(src_dir, dst_dir):
+    if os.path.exists(dst_dir):
+        shutil.rmtree(dst_dir)
 
-#     shutil.copytree(src_dir, dst_dir)
+    shutil.copytree(src_dir, dst_dir)
 
