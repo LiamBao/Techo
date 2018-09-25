@@ -3,6 +3,7 @@ __author__ = 'liam_bao@163.com'
 import dis
 
 """
+
  子类无法继承父类 __slot__
 
 """
@@ -122,8 +123,75 @@ a()
     强大的分布式任务队列Celery，它可以让任务的执行同主程序完全脱离，甚至不在同一台主机内。
     它通过队列来调度任务，不用担心并发量高时系统负载过大。
     它可以用来处理复杂系统性能问题，却又相当灵活易用.
+    
+"""
+
 
 """
+
+Python 缓存机制
+
+"""
+import datetime
+import random
+
+class MyCache:
+    """"""
+    def __init__(self):
+        """Constructor"""
+        self.cache = {}
+        self.max_cache_size = 10
+
+    def __contains__(self, key):
+        """
+        根据该键是否存在于缓存当中返回True或者False
+        """
+        return key in self.cache
+
+    def update(self, key, value):
+        """
+        更新该缓存字典，您可选择性删除最早条目
+        """
+        if key not in self.cache and len(self.cache) >= self.max_cache_size:
+            self.remove_oldest()
+        self.cache[key] = {'date_accessed': datetime.datetime.now(),
+                           'value': value}
+
+    def remove_oldest(self):
+        """
+        删除具备最早访问日期的输入数据
+        """
+        oldest_entry = None
+
+        for key in self.cache:
+            if oldest_entry == None:
+                oldest_entry = key
+            elif self.cache[key]['date_accessed'] < self.cache[oldest_entry]['date_accessed']:
+                oldest_entry = key
+
+        self.cache.pop(oldest_entry)
+
+    @property
+    def size(self):
+        """
+        返回缓存容量大小
+        """
+        return len(self.cache)
+
+if __name__ == '__main__':
+    #测试缓存
+    keys = ['test', 'red', 'fox', 'fence', 'junk', \
+            'other', 'alpha', 'bravo', 'cal', 'devo', 'ele']
+    s = 'abcdefghijklmnop'
+    cache = MyCache()
+    for i, key in enumerate(keys):
+        if key in cache:
+            continue
+        else:
+            value = ''.join([random.choice(s) for i in range(20)])
+            cache.update(key, value)
+        print("#%s iterations, #%s cached entries" % (i+1, cache.size))
+
 
 
 """
@@ -192,7 +260,9 @@ beware timeouts and queue length
 
 """
 
-"""shortest path """
+"""
+shortest path
+ """
 from collections import defaultdict
 from heapq import *
 
