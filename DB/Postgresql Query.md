@@ -1,13 +1,44 @@
 http://www.ntu.edu.sg/home/ehchua/programming/sql/PostgreSQL_GetStarted.html
 
-https://blog.csdn.net/zhwzju/article/details/49636817 分片
+https://blog.csdn.net/zhwzju/article/details/49636817 ***分片
 
-
+```
 ALTER TABLE assets 
     ALTER COLUMN location TYPE VARCHAR,
     ALTER COLUMN description TYPE VARCHAR;
-    
-    
+```
+
+- Create a view
+```sql
+CREATE VIEW myview AS
+    SELECT city, temp_lo, temp_hi, prcp, date, location
+        FROM weather, cities
+        WHERE city = name;
+
+SELECT * FROM myview;
+```
+
+
+```sql
+SELECT depname, empno, salary,
+       rank() OVER (PARTITION BY depname ORDER BY salary DESC) FROM empsalary;
+```
+Output:
+```
+depname  | empno | salary | rank
+-----------+-------+--------+------
+ develop   |     8 |   6000 |    1
+ develop   |    10 |   5200 |    2
+ develop   |    11 |   5200 |    2
+ develop   |     9 |   4500 |    4
+ develop   |     7 |   4200 |    5
+ personnel |     2 |   3900 |    1
+ personnel |     5 |   3500 |    2
+ sales     |     1 |   5000 |    1
+ sales     |     4 |   4800 |    2
+ sales     |     3 |   4800 |    2
+(10 rows)
+```
 
 - `ssh matrix@10.79.44.52`
 
