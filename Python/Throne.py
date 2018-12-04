@@ -8,11 +8,15 @@ import dis
 
 """
 
+from datetime import datetime
+baset = datetime.now()
+a = baset.timestamp()
+datetime.fromtimestamp(a, timezone=utc)"{:07.3f}".format(12)
+
 """
     策略模式
 
 """
-
 
 """
     上下文管理器

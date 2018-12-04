@@ -3,6 +3,10 @@ mkdir -p $logdir > /dev/null 2>&1
 bash -x ./build.sh $CONFIGFILE $2 > $logdir/build-heb-vms-$ts.log 2>&1
 
 
+sudo nohup node server.js &
+netstat -tunlp | greo 80
+
+
 
 # Remove cached SSH keys for the vm, new RSA keypair will be used.
 egrep -v "$6" /root/.ssh/known_hosts > /root/.ssh/known_hosts.new

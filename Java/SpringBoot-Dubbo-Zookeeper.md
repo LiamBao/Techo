@@ -1,19 +1,3 @@
-###start up
->   redis-server redis.conf
->   nohup ./src/redis-server redis.conf &
-killall redis-server
-
-    brew install zookeeper
-    To have launchd start zookeeper now and restart at login:
-    brew services start zookeeper
-    Or, if you don't want/need a background service you can just run:
-    zkServer start
-
-/usr/local/etc/zookeeper/zoo.cfg
-
-#### compile:
-mvn clean source:jar install -Dmaven.test.skip
-mvn clean package -Dmaven.test.skip=true //huhu
 
 IDE 支持
 使用以下命令来生成 IDE 的工程
@@ -24,58 +8,6 @@ eclipse
 mvn eclipse:eclipse
 
 mvn spring-boot:run
-- redis.conf
-```
-daemonize yes
-pidfile /usr/local/Cellar/redis/4.0.9/redis.pid
-port 6379
-timeout 300
-loglevel debug
-logfile /Users/liambao/Desktop/bitbuckets/huhuserver/logs/log-redis.log
-databases 16
-save 900 1
-save 300 10
-save 60 10000
-rdbcompression yes
-dbfilename dump.rdb
-dir /Users/liambao/Desktop/bitbuckets/huhuserver/logs/
-appendonly no
-appendfsync everysec
-stop-writes-on-bgsave-error no
-```
-
-- zoo.conf
-```
-# The number of milliseconds of each tick
-tickTime=2000
-# The number of ticks that the initial 
-# synchronization phase can take
-initLimit=10
-# The number of ticks that can pass between 
-# sending a request and getting an acknowledgement
-syncLimit=5
-# the directory where the snapshot is stored.
-# do not use /tmp for storage, /tmp here is just 
-# example sakes
-dataDir=/Users/ruihuan/Documents/02MyPrivate/02Star/zookeeper-3.4.12/data
-# the port at which the clients will connect
-clientPort=2181
-# the maximum number of client connections.
-# increase this if you need to handle more clients
-#maxClientCnxns=60
-#
-# Be sure to read the maintenance section of the 
-# administrator guide before turning on autopurge.
-#
-# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
-#
-# The number of snapshots to retain in dataDir
-#autopurge.snapRetainCount=3
-# Purge task interval in hours
-# Set to "0" to disable auto purge feature
-#autopurge.purgeInterval=1
-```
-
 
 
 https://zhuanlan.zhihu.com/p/25862694
