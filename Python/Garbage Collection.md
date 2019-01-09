@@ -1,4 +1,13 @@
 - [内存管理及释放 ](https://blog.csdn.net/jiangjiang_jian/article/details/79140742)
+- [Python 进程内存增长解决方案](https://zhuanlan.zhihu.com/p/28031057)
+- [记一次调试python内存泄露的问题](https://cloud.tencent.com/developer/article/1115715)
+- []()
+- []()
+- []()
+- []()
+- []()
+
+
 
 ----
 

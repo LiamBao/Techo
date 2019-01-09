@@ -85,7 +85,7 @@ async def get_all_users():
         return conn.query('SELECT ...')
 
 class MyContextManager(object):
-    
+
     def __enter__(self):
         print("Hello")
         return self
@@ -102,9 +102,9 @@ with MyContextManager() as worker:
 
 """
     Python 调用机制
-    
-    For new-style classes, implicit invocations of special methods are only guaranteed 
-    to work correctly if defined on an object’s type, not in the object’s instance dictionary. 
+
+    For new-style classes, implicit invocations of special methods are only guaranteed
+    to work correctly if defined on an object’s type, not in the object’s instance dictionary.
 """
 class A(object):
     def __call__(self):
@@ -161,7 +161,7 @@ a()
     强大的分布式任务队列Celery，它可以让任务的执行同主程序完全脱离，甚至不在同一台主机内。
     它通过队列来调度任务，不用担心并发量高时系统负载过大。
     它可以用来处理复杂系统性能问题，却又相当灵活易用.
-    
+
 """
 
 
@@ -246,11 +246,11 @@ if __name__ == '__main__':
 """
 class Vehicle(object):
     pass
- 
+
 class PlaneMixin(object):
     def fly(self):
         print 'I am flying'
- 
+
 class Airplane(Vehicle, PlaneMixin):
     pass
 
@@ -261,7 +261,7 @@ class Airplane(Vehicle, PlaneMixin):
      使用事件循环驱动的协程实现并发.
 
 ##Thinking outside the GIL with asnicIO and multiprocessing
-###impact 
+###impact
 one binary
 fetccch the world
 process ecerything
@@ -270,7 +270,7 @@ thread pool for IO
 
 ###not aging well
 scales in time and memeory
-runtime now too slow 
+runtime now too slow
 underutilizing hardware
 ultimately limited by the GIL
 
@@ -336,7 +336,7 @@ def dijkstra(graph_dict, from_node, to_node):
             Shortest_path.append(left)
             right = right[1]
         Shortest_path.reverse()
-        
+
     return cost,Shortest_path
 
 def dijkstra_all(graph_dict):
@@ -346,20 +346,20 @@ def dijkstra_all(graph_dict):
             if i != j:
                 cost,Shortest_path = dijkstra(graph_dict,i,j)
                 Shortest_path_dict[i][j] = Shortest_path
-                
+
     return Shortest_path_dict
 
 nodes=['s1','s2','s3','s4','s5','s6']
 print("nodes =",nodes)
 M=float("inf")
 # Describing graph by 2-D list
-graph_list = [  
-[0,30,15,M,M,M],  
-[5,0,M,M,20,30],  
-[M,10,0,M,M,15],  
-[M,M,M,0,M,M],  
-[M,M,M,10,0,M],  
-[M,M,M,30,10,0]  
+graph_list = [
+[0,30,15,M,M,M],
+[5,0,M,M,20,30],
+[M,10,0,M,M,15],
+[M,M,M,0,M,M],
+[M,M,M,10,0,M],
+[M,M,M,30,10,0]
 ]
 print("graph_list = [")
 for l in graph_list:
@@ -469,7 +469,7 @@ class adapter(object):
         self.adapter_ext = adapter_ext()
 
     def foo(self):
-        print('foo in adapter') 
+        print('foo in adapter')
         self.adapter_ext.foo()
 
     def __getattr__(self, name):
@@ -485,7 +485,7 @@ if __name__ == '__main__':
     线程锁Lock & ThreadLocal
     对于多线程来说，最大的特点就是线程之间可以共享数据，那么共享数据就会出现多线程同时更改一个变量，使用同样的资源，而出现死锁、数据错乱等情况
     线程锁: 当访问某个资源之前，用Lock.acquire()锁住资源,访问之后，用Lock.release()释放资源
-    
+
     多线程缺陷:
     在Python中，有一个GIL，即全局解释锁，该锁的存在保证在同一个时间只能有一个线程执行任务，也就是多线程并不是真正的并发，只是交替得执行
     假如有10个线程炮在10核CPU上，当前工作的也只能是一个CPU上的线程
@@ -511,7 +511,7 @@ def target():
     finally:
     #用finally的目的是防止当前线程无线占用资源
         lock.release()
-    print('the curent threading  %s is ended' % threading.current_thread().name) 
+    print('the curent threading  %s is ended' % threading.current_thread().name)
 t = threading.Thread(target=target)
 t1 = threading.Thread(target=target)
 
@@ -522,7 +522,7 @@ t1.join()
 print(a)
 
 ## threadLocal
-v 属性只有本线程可以修改，其他线程不可以
+# v 属性只有本线程可以修改，其他线程不可以
 from time import sleep
 from random import random
 from threading import Thread, local
@@ -666,7 +666,7 @@ class Publisher(object):
     创建了一个用于存放所有观察者对象的list,add remove方法用于 新增/移除 观察者对象
     而notify方法就是将由事件触发的消息发送给每个观察者,并调用观察者自己的notify方法进行操作
     这是实现观察者模式的核心
-    """ 
+    """
     def __init__(self):
         self.observers = list()
 
@@ -712,15 +712,15 @@ class DefaultFormatter(Publisher):
         else:
             self.notify()
 
-class HexFormatter(object):  
+class HexFormatter(object):
     def notify(self, publisher):
         print("{}: '{}' has now hex data = {}".format(type(self).__name__,publisher.name, hex(publisher.data)))
 
-class BinaryFormatter(object):  
+class BinaryFormatter(object):
     def notify(self, publisher):
-        print("{}: '{}' has now bin data = {}".format(type(self).__name__,publisher.name, bin(publisher.data)))  
+        print("{}: '{}' has now bin data = {}".format(type(self).__name__,publisher.name, bin(publisher.data)))
 
-def main():  
+def main():
     df = DefaultFormatter('test1')
     print(df)
     cf = DefaultFormatter('test2')
@@ -767,7 +767,7 @@ def main():
     cf.data = 32
     print(cf)
 
-if __name__ == '__main__':  
+if __name__ == '__main__':
     main()
 
 """
@@ -842,10 +842,10 @@ time = [timeit(a),timeit(b),timeit(c)]
 print('result:\n%s %s %s\n'%(a(),b(),c()))
 
 #打印时间
-print('time:\n%s\n'%( ''.join([str(_)+'\n' for _ in time]) )) 
+print('time:\n%s\n'%( ''.join([str(_)+'\n' for _ in time]) ))
 
 #打印指令
-print('orders:\n') 
+print('orders:\n')
 dis(a)
 print( '\n')
 dis(b)
@@ -870,7 +870,7 @@ dis(c)
      Most introductory examples show this as a function, but I’ve found that it’s easier to start understanding decorators by using classes as decoration mechanisms instead of functions. In addition, it’s more powerful.
 
      The only constraint upon the object returned by the decorator is that it can be used as a function – which basically means it must be callable. Thus, any classes we use as decorators must implement __call__.
-    
+
      Notice that the constructor for my_decorator is executed at the point of decoration of the function. Since we can call f() inside __init__(), it shows that the creation of f() is complete before the decorator is called. Note also that the decorator constructor receives the function object being decorated. Typically, you’ll capture the function object in the constructor and later use it in the __call__() method (the fact that decoration and calling are two clear phases when using classes is why I argue that it’s easier and more powerful this way).
 
      The reason I think decorators will have such a big impact is because this little bit of syntax sugar changes the way you think about programming. Indeed, it brings the idea of “applying code to other code” (i.e.: macros) into mainstream thinking by formalizing it as a language construct.
@@ -968,7 +968,7 @@ if __name__ == '__main__':
     app.run()
 
 
-""" ===========>>>>>>>>>> Magic Functions STARTS 
+""" ===========>>>>>>>>>> Magic Functions STARTS
     http://www.cnblogs.com/Jimmy1988/p/6804095.html
 """
 
@@ -989,13 +989,13 @@ if __name__ == '__main__':
 class Test:
       def __getattr__(self, name):
          print('__getattr__')
- 
+
       def __getattribute__(self, name):
          print('__getattribute__')
- 
+
       def __setattr__(self, name, value):
          print('__setattr__')
- 
+
       def __delattr__(self, name):
          print('__delattr__')
 
@@ -1028,14 +1028,14 @@ t.x
 class Test:
       def __getattr__(self, name):
          print('__getattr__')
- 
+
       def __getattribute__(self, name):
          print('__getattribute__')
          object.__getattribute__(self, name)
- 
+
       def __setattr__(self, name, value):
          print('__setattr__')
- 
+
       def __delattr__(self, name):
          print('__delattr__')
 
@@ -1049,16 +1049,16 @@ super() 方法
 class Test:
       def __getattr__(self, name):
          print('__getattr__')
- 
+
       def __getattribute__(self, name):
          print('__getattribute__')
         #super(Test, self).__getattribute__(name)
 # OR
          super().__getattribute__(name)
- 
+
       def __setattr__(self, name, value):
          print('__setattr__')
- 
+
       def __delattr__(self, name):
          print('__delattr__')
 
@@ -1067,10 +1067,10 @@ t.x
 """ ===========<<<<<<<<<< Magic Functions ENDS  """
 
 
-""" 
+"""
 
      Python类分为两种，一种叫经典类，一种叫新式类。两种都支持多继承。
-     
+
      super figures out which is the next class in the Method Resolution Order. The two arguments you pass in are what lets it figure that out - self gives it the entire MRO via an attribute; the current class tells it where you are along the MRO right now. So what super is actually doing is basically:
 
     ```
@@ -1081,7 +1081,7 @@ t.x
 
     The reason it is the current class rather than the base class is because the entire point of having super is to have a function that works out what that base class is rather than having to refer to it explicitly - which can cause problems if the base class' name changes, if you don't know exactly what the parent class is called (think of factory functions like namedtuple that spit out a new class), and especially in multi-inheritance situations (where the next class in the MRO mightn't be one of the current class' bases).
 
-""" 
+"""
 # 经典类
 class A():
     def __init__(self):
@@ -1131,7 +1131,7 @@ class Person(object):
 class Consumer(object):
     def __init__(self):
         print('Consumer')
-    
+
 class Student(Person, Consumer):
     def __init__(self, score, name):
         print(Student.__bases__)
@@ -1176,34 +1176,34 @@ print(p1.name)
 
 """
 
-class Fjs(object):  
+class Fjs(object):
 
-    def __init__(self, name):  
-        self.name = name  
-  
-    def hello(self):  
+    def __init__(self, name):
+        self.name = name
+
+    def hello(self):
         print("said by : "+self.name)
-  
-    def fjs(self, name):  
-        if name == self.name:  
-            print("yes")  
-        else:  
+
+    def fjs(self, name):
+        if name == self.name:
+            print("yes")
+        else:
             print("no")
-  
-class Wrap_Fjs(object):  
-    def __init__(self, fjs):  
-        self._fjs = fjs  
-  
-    def __getattr__(self, item):  
-        if item == "hello":  
+
+class Wrap_Fjs(object):
+    def __init__(self, fjs):
+        self._fjs = fjs
+
+    def __getattr__(self, item):
+        if item == "hello":
             print("调用hello方法了")
-        elif item == "fjs":  
+        elif item == "fjs":
             print("调用fjs方法了")
-        return getattr(self._fjs, item)  
-  
-fjs = Wrap_Fjs(Fjs("fjs"))  
-fjs.hello()  
-fjs.fjs("fjs")  
+        return getattr(self._fjs, item)
+
+fjs = Wrap_Fjs(Fjs("fjs"))
+fjs.hello()
+fjs.fjs("fjs")
 
 
 """
