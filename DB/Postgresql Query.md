@@ -5,7 +5,7 @@ https://blog.csdn.net/zhwzju/article/details/49636817 ***分片
 - [(递归）CTE 通用表表达式](http://www.jasongj.com/sql/cte/)
 - [使用PostgreSQL进行复杂查询](http://zealscott.com/posts/6785/)
 - [高级SQL特性](https://yq.aliyun.com/articles/626536)
-- []()
+- [从PostgreSQL json中提取数组](https://github.com/digoal/blog/blob/master/201609/20160910_01.md)
 - []()
 - []()
 - []()
@@ -130,6 +130,36 @@ select jsonb '{"a":1, "b": {"c":[1,2,3], "d":["k","y","z"]}, "d":"kbc"}' @> '{"b
     (js ->> 'key2' )::numeric between xx and xx
 ```
 
+
+
+select * from event
+where  event_opts->0->'opt_data'->'sac_addr'
+@> '"00173b0101000018"'::jsonb;
+
+select * from event
+where  event_opts->0->'opt_data'->'sac_addr'='"00173b0101000018"';
+
+SELECT data->'title' FROM books WHERE data->'genres' @> '["Fiction"]'::jsonb;
+
+select pg_typeof(col), jsonb_typeof(col),col from (select event_opts col from event) t;
+
+ select json_each('{[1,2,3,"d":{"f1":1,"f2":[5,6]},4]}');
+select jsonb_each('{"a":"foo", "b":"bar"}');
+
+
+select pg_typeof('{"a":[1,2,3],"b":[4,5,6]}'::json->>'a'), '{"a":[1,2,3],"b":[4,5,6]}'::json->>'a';
+
+select * from event where json_arr2int_arr( event_opts->0->'opt_data'->'sac_addr') @> array['0xFFFF'];
+
+SELECT array(select (json_array_elements_text('{"a":"B","b":[1,2,3,4,5,6]}'::json->'b'))::int );
+SELECT array(select json_array_elements_text('{"a":"B","b":[1,2,3,4,5,6]}'::json->'b'));
+
+ create extension ltree;
+
+select * from pg_extension ;
+
+-  验证数据库设置类型及数据类型
+    `select pg_typeof(col), jsonb_typeof(col),col from (select event_opts col from event) t;`
 ----
 
  - **给出那些所有temp_lo值曾都低于 40的城市。最后，如果我们只关心那些名字以“S”开头的城市，我们可以用：**
@@ -179,5 +209,105 @@ select a.question_id, max(is_read) as is_read from (
 ```
 这里的json->>直接使用了两层解析结构
 
+---
+#### PostgreSQL 树状数据存储与查询(非递归)
+> https://github.com/digoal/blog/blob/master/201105/20110527_01.md
 
-####
+```sql
+
+
+select * from tbl_music
+order by song;
+
+create table tbl_music(id serial4,song ltree not null);
+insert into tbl_music (song) values ('GangTai.NanGeShou.LiuDeHua.AiNiYiWanNian');
+insert into tbl_music (song) values ('GangTai.NanGeShou.LiuDeHua.JinTian');
+insert into tbl_music (song) values ('GangTai.NanGeShou.LiuDeHua.WangQinShui');
+insert into tbl_music (song) values ('GangTai.NanGeShou.ZhangXueYou.WenBie');
+insert into tbl_music (song) values ('GangTai.NanGeShou.ZhangXueYou.QingShu');
+insert into tbl_music (song) values ('GangTai.NvGeShou.ZhenXiuWen.MeiFeiSeWu');
+insert into tbl_music (song) values ('GangTai.NvGeShou.ZhenXiuWen.ZhongShenMeiLi');
+insert into tbl_music (song) values ('DaLu.NanGeShou.DaoLang.2002NianDeDiYiChangXue');
+insert into tbl_music (song) values ('DaLu.NvGeShou.FanBinBin.FeiNiao');
+
+select subltree(song,0,4) from tbl_music where subltree(song,2,3)='LiuDeHua';
+
+select distinct subltree(song,2,3) from tbl_music where song <@
+(select  subpath(song,0,2) from tbl_music where subltree(song,2,3)='LiuDeHua' limit 1);
+```
+
+----
+
+-
+```sql
+create table tbl (
+  uid int8 primary key,  -- 用户ID
+  pid int8               -- 直接上游ID,如果一个用户是ROOT用户，则PID为 null
+);
+
+create index idx_tbl_1 on tbl (pid);
+
+create or replace function gen_pid(int8) returns int8 as $$
+  -- 生成它的上游ID，2w以内的ID为根ID。其他都取比它小2w对应的那个ID，形成一颗50级的树。
+  select case when $1<=20000 then null else $1-20000 end;
+$$ language sql strict;
+
+-- 写入100w数据，形成深度为50的树。
+insert into tbl select id, gen_pid(id) from generate_series(1,1000000) t(id) on conflict do nothing;
+
+select count(0) from tbl;
+select * from tbl order by uid desc limit 100 ;
+
+
+with recursive tmp as (select * from tbl where uid=992999
+union all
+select tbl.* from tbl join tmp on (tmp.pid=tbl.uid))
+select uid,pid from tmp where pid is null or uid=992999;
+
+
+with recursive tmp as (select * from tbl where uid=992999
+union all
+select tbl.* from tbl join tmp on (tmp.pid=tbl.uid))
+select uid,pid from tmp;
+
+\set uid random(1,10000)
+with recursive tmp as (select * from tbl where uid=:uid
+union all
+select tbl.* from tbl join tmp on (tmp.pid=tbl.uid))
+select uid,pid from tmp where pid is null or uid=:uid;
+```
+
+
+```
+create table a(id int primary key, info text);
+
+create table b(id int primary key, aid int, crt_time timestamp);
+create index b_aid on b(aid);
+
+-- a表插入1000条
+insert into a select generate_series(1,1000), md5(random()::text);
+
+-- b表插入500万条，只包含aid的500个id。
+insert into b select generate_series(1,5000000), generate_series(1,500), clock_timestamp();
+
+
+select * from b
+limit 100
+
+select a.id from a left join b on (a.id=b.aid) where b.* is null;
+
+select * from a where id not in
+(
+with recursive skip as (
+  (
+    select min(aid) aid from b where aid is not null
+  )
+  union all
+  (
+    select (select min(aid) aid from b where b.aid > s.aid and b.aid is not null)
+      from skip s where s.aid is not null
+  )
+)
+select aid from skip where aid is not null
+);
+```

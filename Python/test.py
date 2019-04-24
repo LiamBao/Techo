@@ -1,18 +1,29 @@
-import os
+class Stack:
+     def __init__(self):
+         self.items = []
 
-from  multiprocessing import Process, Lock
+     def isEmpty(self):
+         return self.items == []
 
-def f( i):
-#    l.acquire()
-#    try:
-        print('hello ', i)
-#    finally:
-#        l.release()
+     def push(self, item):
+         self.items.append(item)
 
-if __name__ == "__main__":
-#    lock = Lock()
-    for i in range(100):
-#        Process(target=f, args=(lock, i)).start()
-        Process(target=f, args=(i,)).start()
+     def pop(self):
+         return self.items.pop()
+
+     def peek(self):
+         return self.items[len(self.items)-1]
+
+     def size(self):
+         return len(self.items)
+
+def baseConverter(decNumber,base):
+    digits = "0123456789ABCDEF"
+    s = Stack()
+    while True:
 
 
+
+print(baseConverter(25,2))
+print(baseConverter(25,16))
+print(baseConverter(16,16))

@@ -136,7 +136,7 @@ a()
 
 
 
-"""
+"""                                     闭包
     闭包(closure)是函数式编程的重要的语法结构。闭包也是一种组织代码的结构，它同样提高了代码的可重复使用性。
 
     当一个内嵌函数引用其外部作作用域的变量,我们就会得到一个闭包. 总结一下,创建一个闭包必须满足以下几点:
@@ -152,7 +152,7 @@ a()
 """
 
 """
-    分布式任务队列Celery
+                                    分布式任务队列Celery
 
     在程序运行过程中，要执行一个很久的任务，但是我们又不想主程序被阻塞，常见的方法是多线程。
     可是当并发量过大时，多线程也会扛不住，必须要用线程池来限制并发个数，而且多线程对共享资源的使用也是很麻烦的事情.
@@ -481,8 +481,97 @@ if __name__ == '__main__':
     a.bar()
 
 """
+                                            Threading:
 
-    线程锁Lock & ThreadLocal
+"""
+
+"""
+                                            threading.local()
+"""
+
+
+import random
+import threading
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='(%(threadName)-10s) %(message)s',
+                    )
+
+
+def show_value(data):
+    try:
+        val = data.value
+    except AttributeError:
+        logging.debug('No value yet')
+    else:
+        logging.debug('value=%s', val)
+
+def worker(data):
+    show_value(data)
+    data.value = random.randint(1, 100)
+    show_value(data)
+
+class MyLocal(threading.local):
+    def __init__(self, value):
+        logging.debug('Initializing %r', self)
+        self.value = value
+
+local_data = MyLocal(1000)
+show_value(local_data)
+
+for i in range(2):
+    t = threading.Thread(target=worker, args=(local_data,))
+    t.start()
+
+
+"""
+                                            threading.Semaphore
+Limiting Concurrent Access to Resources:
+Sometimes it is useful to allow more than one worker access to a resource at a time, while still limiting the overall number. For example, a connection pool might support a fixed number of simultaneous connections, or a network application might support a fixed number of concurrent downloads. A Semaphore is one way to manage those connections.
+In this example, the ActivePool class simply serves as a convenient way to track which threads are able to run at a given moment.
+A real resource pool would allocate a connection or some other value to the newly active thread, and reclaim the value when the thread is done. Here it is just used to hold the names of the active threads to show that only five are running concurrently.
+"""
+
+import logging
+import random
+import threading
+import time
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s (%(threadName)-2s) %(message)s',
+                    )
+class ActivePool(object):
+    def __init__(self):
+        super(ActivePool, self).__init__()
+        self.active = []
+        self.lock = threading.Lock()
+    def makeActive(self, name):
+        with self.lock:
+            self.active.append(name)
+            logging.debug('Running: %s', self.active)
+    def makeInactive(self, name):
+        with self.lock:
+            self.active.remove(name)
+            logging.debug('--Running: %s', self.active)
+
+def worker(s, pool):
+    logging.debug('Waiting to join the pool')
+    with s:
+        name = threading.currentThread().getName()
+        pool.makeActive(name)
+        time.sleep(0.1)
+        pool.makeInactive(name)
+
+pool = ActivePool()
+s = threading.Semaphore(2)
+for i in range(4):
+    t = threading.Thread(target=worker, name=str(i), args=(s, pool))
+    t.start()
+
+"""
+
+                                            线程锁Lock & ThreadLocal
     对于多线程来说，最大的特点就是线程之间可以共享数据，那么共享数据就会出现多线程同时更改一个变量，使用同样的资源，而出现死锁、数据错乱等情况
     线程锁: 当访问某个资源之前，用Lock.acquire()锁住资源,访问之后，用Lock.release()释放资源
 
@@ -581,6 +670,21 @@ class Singleton(type):
         if cls not in cls._instance:
             cls._instance[cls] = super(singleton, cls).__call__(*arg, **kwargs)
         return cls._instance[cls]
+
+# get different instance based on different arguments
+class Singleton(type):
+    """
+    An metaclass for singleton purpose. Every singleton class should inherit from this class by 'metaclass=Singleton'.
+    """
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        key = (args, tuple(sorted(kwargs.items())))
+        if cls not in cls._instances:
+            cls._instances[cls] = {}
+        if key not in cls._instances[cls]:
+            cls._instances[cls][key] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls][key]
 
 # python2
 def Foo(object):
@@ -1253,3 +1357,8 @@ def copy_files(src_dir, dst_dir):
 
     shutil.copytree(src_dir, dst_dir)
 
+
+# Sets are implemented in a way, which doesn't allow mutable objects. The following example demonstrates that we cannot include
+cities = set((("Python","Perl"), ("Paris", "Berlin", "London")))
+cities = set((["Python","Perl"], ["Paris", "Berlin", "London"])) //error
+cities.add(213, 'newcity')
