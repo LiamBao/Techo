@@ -4,7 +4,15 @@
 
 Becoming a super hero is a fairly straight forward process:
 
+{% tabs %}
+{% tab title="First Tab" %}
+first
+{% endtab %}
 
+{% tab title="Second Tab" %}
+second
+{% endtab %}
+{% endtabs %}
 
 ```python
 import os
