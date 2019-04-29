@@ -45,3 +45,5 @@ The Cross-Industry Standard Process for Data Mining (CRISP-DM) is the dominant d
 * Planning deployment (your methods for integrating data mining discoveries into use)
 * Reporting final results
 * Reviewing final results
+
+==new
