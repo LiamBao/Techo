@@ -259,4 +259,7 @@ Bar Plot barplot()用于显示分类列中的每个值相对于数字列的平�
 统计图 统计图与条形图类似，但是它显示特定列中类别的计数 sns.countplot(x='primary_per', data=eui_count)
 
 
-==asd==
+==asd==^~上角标~^
+asd~fd~==~^标记^~==
+
+> 段落引用
